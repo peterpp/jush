@@ -143,7 +143,7 @@ const autocompleteTests = [ // state, text before and after the caret, expected 
 	['sql', 'SELECT * FROM ', '', '{"albums ":0,"songs ":0}', tables], // all tables are offered after FROM
 	['sql', 'SELECT id,\ntitle\nFROM albums\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // the query can span lines
 	['sql', '/* WHERE\nin a comment */\nSELECT * FROM albums\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a multi-line comment is ignored
-	['sql', 'SELECT * FROM albums\nWHERE id = 1\n;\n', '', '{"SELECT ":0,"INSERT INTO ":0,"UPDATE ":0,"DELETE FROM ":0,"TRUNCATE ":0,"EXPLAIN ":0}', tables], // the previous query is stripped
+	['sql', 'SELECT * FROM albums\nWHERE id = 1\n;\n', '', '{"SELECT ":0,"INSERT INTO ":0,"UPDATE ":0,"DELETE FROM ":0,"TRUNCATE ":0,"DROP ":0,"EXPLAIN ":0}', tables], // the previous query is stripped
 	['sql', 'SELECT * FROM albums\n', '\nWHERE id = 1;\nSELECT * FROM songs ORDER BY x ', '{"INNER JOIN ":0,"LEFT JOIN ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // the next query is stripped, the rest of the current one is not
 	['sql', 'SELECT *\nFROM albums\nJOIN songs ON albums.id = songs.album\nWHERE ', '', '{"id":0,"interpret":0,"title":0,"album":0,"albums.":0,"songs.":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // columns of all joined tables
 	['sql', 'SELECT * FROM albums a\nWHERE a.', '', '{"id":0,"interpret":0,"title":0}', tables], // columns of an aliased table
