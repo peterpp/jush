@@ -140,7 +140,7 @@ const tables = {
 const quotedTables = { 'my albums': ['my id', 'title'], songs: ['id', 'album'] }; // names which are not identifiers are always quoted
 const autocompleteEsc = { pgsql: '""', mssql: '[]' }; // escaped empty identifier, the other states use ``
 const autocompleteTests = [ // state, text before and after the caret, expected words with the length of the typed prefix, tables with columns
-	['sql', 'SELECT * FROM ', '', '{"albums ":0,"songs ":0}', tables], // all tables are offered after FROM
+	['sql', 'SELECT * FROM ', '', '{"albums":0,"songs":0}', tables], // all tables are offered after FROM
 	['sql', 'SELECT id,\ntitle\nFROM albums\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // the query can span lines
 	['sql', '/* WHERE\nin a comment */\nSELECT * FROM albums\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a multi-line comment is ignored
 	['sql', 'SELECT * FROM albums\nWHERE id = 1\n;\n', '', '{"SELECT ":0,"INSERT INTO ":0,"UPDATE ":0,"DELETE FROM ":0,"TRUNCATE ":0,"DROP ":0,"EXPLAIN ":0}', tables], // the previous query is stripped
@@ -149,9 +149,9 @@ const autocompleteTests = [ // state, text before and after the caret, expected 
 	['sql', 'SELECT * FROM albums a\nWHERE a.', '', '{"id":0,"interpret":0,"title":0}', tables], // columns of an aliased table
 	['sql', 'SELECT * FROM albums\nWHERE ti', '', '{"title":2}', tables], // the value is the length of the typed prefix
 	['com', 'SELECT ', '', '{}', tables], // no autocomplete in a comment
-	['sql', 'SELECT * FROM ', '', '{"`my albums` ":0,"songs ":0}', quotedTables], // MySQL quotes a name which is not an identifier
+	['sql', 'SELECT * FROM ', '', '{"`my albums`":0,"songs":0}', quotedTables], // MySQL quotes a name which is not an identifier
 	['sql', 'SELECT * FROM `albums`\nWHERE ', '', '{"`id`":0,"`interpret`":0,"`title`":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a backtick anywhere quotes everything, the table name is found inside it
-	['pgsql', 'SELECT * FROM ', '', '{"\\"my albums\\" ":0,"songs ":0}', quotedTables], // PostgreSQL quotes by ""
+	['pgsql', 'SELECT * FROM ', '', '{"\\"my albums\\"":0,"songs":0}', quotedTables], // PostgreSQL quotes by ""
 	['mssql', 'SELECT * FROM [my albums]\nWHERE ', '', '{"[my id]":0,"[title]":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', quotedTables], // MS SQL quotes by [], the table name is found inside it
 ];
 
