@@ -93,12 +93,12 @@ jush.textarea = (function () {
 		}
 		const html = jush.highlight(lang, text).replace(/\n/g, '<br>');
 		setHTML(pre, html, text, end);
-		if (openAc) {
+		if (openAc && (text !== "" || !config.silentStart)) {
 			openAutocomplete(pre);
-			openAc = false;
 		} else {
 			closeAutocomplete();
 		}
+		openAc = false;
 	}
 
 	function setHTML(pre, html, text, pos) {
@@ -325,14 +325,18 @@ jush.textarea = (function () {
 
 	let pre;
 	let autocomplete = () => ({});
+	let config = {};
 	addEventListener('resize', positionAutocomplete);
 
-	return function textarea(el, autocompleter) {
+	return function textarea(el, autocompleter, configuration) {
 		if (!window.getSelection) {
 			return;
 		}
 		if (autocompleter) {
 			autocomplete = autocompleter;
+		}
+		if (configuration) {
+			config = configuration;
 		}
 		pre = document.createElement('pre');
 		pre.contentEditable = true;
@@ -362,7 +366,7 @@ jush.textarea = (function () {
 		el.before(acEl);
 		if (document.activeElement === el) {
 			pre.focus();
-			if (!el.value) {
+			if (!config.silentStart && !el.value) {
 				openAutocomplete(pre);
 			}
 		}
