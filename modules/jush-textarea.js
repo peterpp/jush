@@ -247,13 +247,21 @@ jush.textarea = (function () {
 		const sel = getSelection();
 		const range = sel.rangeCount && sel.getRangeAt(0);
 		if (range) {
-			const insert = acEl.options[acEl.selectedIndex].textContent;
+			let insert = acEl.options[acEl.selectedIndex].textContent;
 			const offset = +acEl.options[acEl.selectedIndex].value;
 			forceNewUndo = true;
 			pre.lastPos = findSelPos(pre);
 			const start = findOffset(pre, pre.lastPos - offset);
 			if (start) {
 				range.setStart(start.container, start.offset);
+
+				// Workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=1985649
+				if (navigator.userAgent.match(/firefox/i)) {
+					const text = pre.innerText;
+					if (text.length === pre.lastPos && text[pre.lastPos - offset - 1] === '\n') {
+						insert = '\n' + insert;
+					}
+				}
 			}
 			document.execCommand('insertText', false, insert);
 			if (/ $/.test(insert)) {
