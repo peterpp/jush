@@ -262,7 +262,9 @@ jush.textarea = (function () {
 				}
 			}
 			document.execCommand('insertText', false, insert);
-			openAutocomplete(pre);
+			if (insert.match(/ $/)) {
+				openAutocomplete(pre);
+			}
 		}
 	}
 	
