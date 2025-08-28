@@ -39,8 +39,12 @@ jush.autocompleteSql = function (esc, tablesColumns) {
 		if (/^(one|com|sql_apo|sqlite_apo)$/.test(state)) {
 			return {};
 		}
+		// do not offer autocomplete in comments
+		if (before.match(/\/\*((?!\*\/).)*$/s) || before.match(/(^|\s)--[^\n]*$/)) {
+			return {};
+		}
 		before = before
-			.replace(/\/\*.*?\*\/|\s--[^\n]*|'[^']+'/s, '') // strip comments and strings
+			.replace(/\/\*.*?\*\/|(^|\s)--[^\n]*|'[^']+'/s, '') // strip comments and strings
 			.replace(/.*;/s, '') // strip previous query
 			.trimStart()
 		;
@@ -77,7 +81,7 @@ jush.autocompleteSql = function (esc, tablesColumns) {
 		
 		const context = before.replace(escRe('[\\w`]+$'), ''); // in 'UPDATE tab.`co', context is 'UPDATE tab.'
 		before = before.replace(escRe('.*[^\\w`]', 's'), ''); // in 'UPDATE tab.`co', before is '`co'
-		
+
 		const thisColumns = []; // columns in the current table ('table.')
 		const match = context.match(escRe('`?(\\w+)`?\\.$'));
 		if (match) {
