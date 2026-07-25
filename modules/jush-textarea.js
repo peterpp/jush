@@ -176,7 +176,7 @@ jush.textarea = (function () {
 	acEl.onclick = () => {
 		insertAutocomplete(pre);
 	};
-	openAc = false;
+	let openAc = false;
 	closeAutocomplete();
 
 	function findState(node) {
