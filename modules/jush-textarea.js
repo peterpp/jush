@@ -31,8 +31,8 @@ jush.textarea = (function () {
 			if (/^(br|div)$/i.test(child.tagName)) {
 				pos.pos++;
 			}
-			for (let i = 0; i < child.childNodes.length; i++) {
-				if (findPositionRecurse(child.childNodes[i], container, offset, pos)) {
+			for (const node of child.childNodes) {
+				if (findPositionRecurse(node, container, offset, pos)) {
 					return true;
 				}
 			}

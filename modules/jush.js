@@ -114,10 +114,9 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 	link_manual: function (language, text) {
 		const code = document.createElement('code');
 		code.innerHTML = this.highlight(language, text);
-		const as = code.getElementsByTagName('a');
-		for (let i = 0; i < as.length; i++) {
-			if (as[i].href) {
-				return as[i].href;
+		for (const a of code.getElementsByTagName('a')) {
+			if (a.href) {
+				return a.href;
 			}
 		}
 		return '';
