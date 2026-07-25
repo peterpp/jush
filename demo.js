@@ -5,7 +5,7 @@
 	const source = document.getElementById('source');
 	let value = '';
 	if (!source.value && location.hash) {
-		source.value = location.hash.slice(1);
+		source.value = decodeURIComponent(location.hash.slice(1));
 	}
 	source.oninput = function highlight() {
 		if (value == source.value) {
