@@ -10,7 +10,7 @@
 unnecessary escaping (e.g. echo "\'" or ='&quot;') is removed
 */
 
-var jush = {
+var jush = { // var (not const) - consumers such as Adminer check window.jush
 	create_links: true, // string for extra <a> parameters, e.g. 'target="_blank"'
 	timeout: 1000, // milliseconds
 	custom_links: { }, // { state: { url: regexp } }, for example { php : { 'doc/$&.html': /\b(getData|setData)\b/g } }
@@ -28,7 +28,7 @@ var jush = {
 	* @param [string]
 	*/
 	style: function (href, media) {
-		var link = document.createElement('link');
+		const link = document.createElement('link');
 		link.rel = 'stylesheet';
 		if (media) {
 			link.media = media;
@@ -54,12 +54,12 @@ var jush = {
 	* @return string
 	*/
 	highlight_html: function (language, html) {
-		var original = html.replace(/<br(\s+[^>]*)?>/gi, '\n');
-		var highlighted = jush.highlight(language, jush.html_entity_decode(original.replace(/<[^>]*>/g, '')));
+		const original = html.replace(/<br(\s+[^>]*)?>/gi, '\n');
+		let highlighted = jush.highlight(language, jush.html_entity_decode(original.replace(/<[^>]*>/g, '')));
 
-		var inject = { };
-		var pos = 0;
-		var last_offset = 0;
+		const inject = { };
+		let pos = 0;
+		let last_offset = 0;
 		original.replace(/(&[^;]+;)|(?:<[^>]+>)+/g, function (str, entity, offset) {
 			pos += (offset - last_offset) + (entity ? 1 : 0);
 			if (!entity) {
@@ -70,7 +70,7 @@ var jush = {
 
 		pos = 0;
 		highlighted = highlighted.replace(/([^&<]*)(?:(&[^;]+;)|(?:<[^>]+>)+|$)/g, function (str, text, entity) {
-			for (var i = text.length; i >= 0; i--) {
+			for (let i = text.length; i >= 0; i--) {
 				if (inject[pos + i]) {
 					str = str.substr(0, i) + inject[pos + i] + str.substr(i);
 					delete inject[pos + i];
@@ -87,18 +87,18 @@ var jush = {
 	* @param number number of spaces for tab, 0 for tab itself, defaults to 4
 	*/
 	highlight_tag: function (tag, tab_width) {
-		var pre = (typeof tag == 'string' ? Array.prototype.slice.call(document.getElementsByTagName(tag)) : tag);
-		var tab = '';
-		for (var i = (tab_width !== undefined ? tab_width : 4); i--; ) {
+		const pre = (typeof tag == 'string' ? Array.prototype.slice.call(document.getElementsByTagName(tag)) : tag);
+		let tab = '';
+		for (let i = (tab_width !== undefined ? tab_width : 4); i--; ) {
 			tab += ' ';
 		}
-		var i = 0;
-		var highlight = function () {
-			var start = new Date();
+		let i = 0;
+		const highlight = function () {
+			const start = new Date();
 			while (i < pre.length) {
-				var match = /(^|\s)(?:jush|language(?=-\S))($|\s|-(\S+))/.exec(pre[i].className); // https://www.w3.org/TR/html5/text-level-semantics.html#the-code-element
+				const match = /(^|\s)(?:jush|language(?=-\S))($|\s|-(\S+))/.exec(pre[i].className); // https://www.w3.org/TR/html5/text-level-semantics.html#the-code-element
 				if (match) {
-					var language = match[3] ? match[3] : 'htm';
+					const language = match[3] ? match[3] : 'htm';
 					pre[i].innerHTML = '<span class="jush"><span class="jush-' + language + '">' + jush.highlight_html(language, pre[i].innerHTML.replace(/\t/g, tab.length ? tab : '\t')) + '</span></span>'; // span - enable style for class="language-"
 				}
 				i++;
@@ -112,10 +112,10 @@ var jush = {
 	},
 
 	link_manual: function (language, text) {
-		var code = document.createElement('code');
+		const code = document.createElement('code');
 		code.innerHTML = this.highlight(language, text);
-		var as = code.getElementsByTagName('a');
-		for (var i = 0; i < as.length; i++) {
+		const as = code.getElementsByTagName('a');
+		for (let i = 0; i < as.length; i++) {
 			if (as[i].href) {
 				return as[i].href;
 			}
@@ -143,23 +143,23 @@ var jush = {
 			state = 'sql';
 		}
 		if (this.links2 && this.links2[state]) {
-			var url = this.urls[state];
-			var links2 = this.links2[state];
-			var link_key = this.link_key[state];
-			var slug = this.slugs[state];
+			const url = this.urls[state];
+			const links2 = this.links2[state];
+			const link_key = this.link_key[state];
+			const slug = this.slugs[state];
 			s = s.replace(links2, function (str, match1) {
-				for (var i=arguments.length - 4; i > 1; i--) {
+				for (let i=arguments.length - 4; i > 1; i--) {
 					if (arguments[i]) {
-						var key = url[i-1];
+						let key = url[i-1];
 						if (link_key) {
 							key = link_key(key, url);
 							if (key == '-') {
 								return str; // the other vendor doesn't know this name at all
 							}
 						}
-						var link = (/^https?:/.test(key) || !key ? key : url[0].replace(/\$key/g, key));
+						let link = (/^https?:/.test(key) || !key ? key : url[0].replace(/\$key/g, key));
 						link = (slug ? link.replace(/\$1/g, slug(arguments[i], key, url)) : link.replace(/\$1/g, arguments[i]).replace(/\\/g, '-'));
-						var title = '';
+						let title = '';
 						if (jush.api[state]) {
 							title = jush.api[state][(state == 'js' ? arguments[i] : arguments[i].toLowerCase())];
 						}
@@ -170,17 +170,17 @@ var jush = {
 		}
 		if (this.custom_links[state]) {
 			if (Array.isArray(this.custom_links[state])) { // backwards compatibility
-				var url = this.custom_links[state][0];
-				var re = this.custom_links[state][1];
+				const url = this.custom_links[state][0];
+				const re = this.custom_links[state][1];
 				this.custom_links[state] = {};
 				this.custom_links[state][url] = re;
 			}
 			next = next || '';
-			var append = this.htmlspecialchars(next || ''); // lookahead context, e.g. '"(' following a quoted routine name
+			const append = this.htmlspecialchars(next || ''); // lookahead context, e.g. '"(' following a quoted routine name
 			s += append;
-			for (var url in this.custom_links[state]) {
+			for (const url in this.custom_links[state]) {
 				s = s.replace(this.custom_links[state][url], function (str) {
-					var offset = arguments[arguments.length - 2];
+					const offset = arguments[arguments.length - 2];
 					if (offset + str.length > s.length - append.length || /<[^>]*$/.test(s.substr(0, offset)) || /^[^<]*<\/a>/.test(s.substr(offset))) {
 						return str; // don't create links inside tags or in the appended context
 					}
@@ -193,12 +193,12 @@ var jush = {
 	},
 
 	build_regexp: function (key, tr1) {
-		var re = [ ];
-		var subpatterns = [ '' ];
-		for (var k in tr1) {
-			var in_bra = false;
+		const re = [ ];
+		const subpatterns = [ '' ];
+		for (const k in tr1) {
+			let in_bra = false;
 			subpatterns.push(k);
-			var s = tr1[k].source.replace(/\\.|\((?!\?)|\[|]|([a-z])(?:-([a-z]))?/gi, function (str, match1, match2) {
+			const s = tr1[k].source.replace(/\\.|\((?!\?)|\[|]|([a-z])(?:-([a-z]))?/gi, function (str, match1, match2) {
 				// count capturing subpatterns
 				if (str == (in_bra ? ']' : '[')) {
 					in_bra = !in_bra;
@@ -222,8 +222,8 @@ var jush = {
 
 	build_links2: function (key, url, prefix, suffix, paths) {
 		this.urls[key] = [url];
-		var regexps = [];
-		for (var path in paths) {
+		const regexps = [];
+		for (const path in paths) {
 			this.urls[key].push(path);
 			regexps.push(paths[path].source);
 		}
@@ -233,32 +233,33 @@ var jush = {
 	highlight_states: function (states, text, in_php, escape) {
 		if (!this.regexps) {
 			this.regexps = { };
-			for (var key in this.tr) {
+			for (const key in this.tr) {
 				this.build_regexp(key, this.tr[key]);
 			}
 		} else {
-			for (var key in this.tr) {
+			for (const key in this.tr) {
 				this.regexps[key].lastIndex = 0;
 			}
 		}
-		var state = states[states.length - 1];
+		let state = states[states.length - 1];
 		if (!Object.keys(this.tr[state] || {}).length) {
 			return [ this.htmlspecialchars(text), states ];
 		}
-		var ret = [ ]; // return
-		for (var i=1; i < states.length; i++) {
+		const ret = [ ]; // return
+		for (let i=1; i < states.length; i++) {
 			ret.push('<span class="jush-' + states[i] + '">');
 		}
-		var match;
-		var child_states = [ ];
-		var s_states;
-		var start = 0;
+		let match;
+		let child_states = [ ];
+		let s_states;
+		let start = 0;
 		while (start < text.length && (match = this.regexps[state].exec(text))) {
 			if (states[0] != 'htm' && /^<\/(script|style)>$/i.test(match[0])) {
 				continue;
 			}
-			var key, m = [ ];
-			for (var i = match.length; i--; ) {
+			let key;
+			const m = [ ];
+			for (let i = match.length; i--; ) {
 				if (match[i] || !match[0].length) { // WScript returns empty string even for non matched subexpressions
 					key = this.subpatterns[state][i];
 					while (this.subpatterns[state][i - 1] == key) {
@@ -279,12 +280,12 @@ var jush = {
 				continue;
 			}
 			//~ console.log(states + ' (' + key + '): ' + text.substring(start).replace(/\n/g, '\\n'));
-			var out = (key.charAt(0) == '_');
-			var division = match.index + (key == 'php_halt2' ? match[0].length : 0);
-			var s = text.substring(start, division);
+			const out = (key.charAt(0) == '_');
+			const division = match.index + (key == 'php_halt2' ? match[0].length : 0);
+			let s = text.substring(start, division);
 
 			// highlight children
-			var prev_state = states[states.length - 2];
+			let prev_state = states[states.length - 2];
 			if (/^(att_quo|att_apo|att_val)$/.test(state) && (/^(att_js|att_css|att_http)$/.test(prev_state) || /^\s*javascript:/i.test(s))) { // javascript: - easy but without own state //! should be checked only in %URI;
 				child_states.unshift(prev_state == 'att_css' ? 'css_pro' : (prev_state == 'att_http' ? 'http' : 'js'));
 				s_states = this.highlight_states(child_states, this.html_entity_decode(s), true, (state == 'att_apo' ? this.htmlspecialchars_apo : (state == 'att_quo' ? this.htmlspecialchars_quo : this.htmlspecialchars_quo_apo)));
@@ -304,7 +305,7 @@ var jush = {
 				child_states.unshift('http');
 				s_states = this.highlight_states(child_states, s, true);
 			} else if (((state == 'php_quo' || state == 'php_apo') && prev_state == 'php_echo') || (state == 'php_eot2' && states[states.length - 3] == 'php_echo')) {
-				var i;
+				let i; // read after the loop
 				for (i=states.length; i--; ) {
 					prev_state = states[i];
 					if (prev_state.substring(0, 3) != 'php' && prev_state != 'att_quo' && prev_state != 'att_apo' && prev_state != 'att_val') {
@@ -312,10 +313,10 @@ var jush = {
 					}
 					prev_state = '';
 				}
-				var f = (state == 'php_eot2' ? this.addslashes : (state == 'php_apo' ? this.addslashes_apo : this.addslashes_quo));
+				const f = (state == 'php_eot2' ? this.addslashes : (state == 'php_apo' ? this.addslashes_apo : this.addslashes_quo));
 				s = this.stripslashes(s);
 				if (/^(att_js|att_css|att_http)$/.test(prev_state)) {
-					var g = (states[i+1] == 'att_quo' ? this.htmlspecialchars_quo : (states[i+1] == 'att_apo' ? this.htmlspecialchars_apo : this.htmlspecialchars_quo_apo));
+					const g = (states[i+1] == 'att_quo' ? this.htmlspecialchars_quo : (states[i+1] == 'att_apo' ? this.htmlspecialchars_apo : this.htmlspecialchars_quo_apo));
 					child_states.unshift(prev_state == 'att_js' ? 'js' : prev_state.substr(4));
 					s_states = this.highlight_states(child_states, this.html_entity_decode(s), true, function (string) { return f(g(string)); });
 				} else if (prev_state && child_states) {
@@ -341,10 +342,10 @@ var jush = {
 					if (/^tag/.test(key)) {
 						this.last_tag = m[2].toLowerCase();
 					}
-					var link = m[2].toLowerCase();
-					var k_link = '';
-					for (var k in this.links[key]) {
-						var m2 = this.links[key][k].exec(m[2]);
+					let link = m[2].toLowerCase();
+					let k_link = '';
+					for (const k in this.links[key]) {
+						const m2 = this.links[key][k].exec(m[2]);
 						if (m2) {
 							if (m2[1]) {
 								link = (key == 'js_http' ? m2[1] : m2[1].toLowerCase().replace(/\\/g, '-')); // \ is PHP namespace
@@ -379,11 +380,11 @@ var jush = {
 				}
 			} else {
 				if (state == 'php_met' && this.last_class) {
-					var title = (jush.api['php2'] ? jush.api['php2'][(this.last_class + '::' + s).toLowerCase()] : '');
+					const title = (jush.api['php2'] ? jush.api['php2'][(this.last_class + '::' + s).toLowerCase()] : '');
 					s = this.create_link(this.urls[state].replace(/\$key/, this.last_class) + '.' + s.toLowerCase().replace(/^__/, ''), s, (title ? ' title="' + this.htmlspecialchars_quo(title) + '"' : ''));
 				}
 				ret.push(s);
-				for (var i = Math.min(states.length, +key.substr(1)); i--; ) {
+				for (let i = Math.min(states.length, +key.substr(1)); i--; ) {
 					ret.push('</span>');
 					states.pop();
 				}
@@ -396,7 +397,7 @@ var jush = {
 			this.regexps[state].lastIndex = start;
 		}
 		ret.push(this.keywords_links(state, this.htmlspecialchars(text.substring(start))));
-		for (var i=1; i < states.length; i++) {
+		for (let i=1; i < states.length; i++) {
 			ret.push('</span>');
 		}
 		states.shift();

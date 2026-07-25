@@ -63,7 +63,7 @@ foreach (preg_split('~\r?\n~', $api) as $line) {
 	}
 }
 
-$jush = set_list($jush, 'var php_class = /(', ')/;', array_keys($class_names), 'classes');
+$jush = set_list($jush, 'const php_class = /(', ')/;', array_keys($class_names), 'classes');
 $jush = set_list($jush, "'function.\$1': /(return|(?:include|require)(?:_once)?|(?:", ')(?=\s*\(|$))/,', array_keys($function_names), 'functions');
 
 file_put_contents($jush_file, $jush);

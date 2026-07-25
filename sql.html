@@ -25,7 +25,7 @@
 <script src="modules/jush-oracle.js"></script>
 <script>
 function highlight(source) {
-	for (var lang in { sql: 1, sqlite: 1, pgsql: 1, mssql: 1, oracle: 1 }) {
+	for (const lang in { sql: 1, sqlite: 1, pgsql: 1, mssql: 1, oracle: 1 }) {
 		document.getElementById(lang).innerHTML = '<code class="jush-' + lang + '">' + jush.highlight(lang, source) + '</code>';
 	}
 	location.hash = encodeURIComponent(source);
@@ -35,7 +35,7 @@ jush.create_links = 'target="_blank"';
 jush.style('jush.css');
 jush.style('jush-dark.css', '(prefers-color-scheme: dark)');
 if (location.hash) {
-	var source = document.getElementById('source');
+	const source = document.getElementById('source');
 	source.value = decodeURIComponent(location.hash.substr(1));
 	highlight(source.value);
 }

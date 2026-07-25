@@ -10,7 +10,7 @@ jush.urls.sql_sqlset = 'https://dev.mysql.com/doc/mysql/en/$key';
 jush.links.sql_sqlset = { 'set-statement.html': /.+/ };
 
 jush.link_key.sql = jush.link_key.sqlset = jush.link_key.sqlstatus = function (key, url) { // keys may be 'mysql-key maria-key'
-	var keys = key.split(' ');
+	const keys = key.split(' ');
 	return (/mariadb/.test(url[0]) ? (keys.length > 1 ? keys[1] : keys[0].replace('.html', '/')) : keys[0]);
 };
 

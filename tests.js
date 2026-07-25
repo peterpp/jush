@@ -2,7 +2,7 @@ jush.create_links = 'target="_blank"';
 jush.custom_links = {sql: {'?table=$&': /\b(tab2?)\b/g}};
 jush.custom_links.bac = jush.custom_links.sql;
 
-var tests = {};
+const tests = {};
 tests.highlight = [
 	['htm', '<a href="">HTML</a> <!-- comment --> &amp;', '<span class="jush"><span class="jush-tag"><span class="jush-op">&lt;</span><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a" class="jush-help" target="_blank">a</a><span class="jush-att"><span class="jush-op"> </span><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a#href" class="jush-help" target="_blank">href</a><span class="jush-att_quo"><span class="jush-op">="</span><span class="jush-op">"</span></span></span><span class="jush-op">&gt;</span></span>HTML<span class="jush-tag"><span class="jush-op">&lt;</span>/a<span class="jush-op">&gt;</span></span> <span class="jush-htm_com"><span class="jush-op">&lt;!--</span> comment <span class="jush-op">--&gt;</span></span> <span class="jush-ent"><span class="jush-op">&amp;</span>amp<span class="jush-op">;</span></span></span>'],
 	['htm', '<a href="" onclick="alert(\'\');">', '<span class="jush"><span class="jush-tag"><span class="jush-op">&lt;</span><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a" class="jush-help" target="_blank">a</a><span class="jush-att"><span class="jush-op"> </span><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a#href" class="jush-help" target="_blank">href</a><span class="jush-att_quo"><span class="jush-op">="</span><span class="jush-op">"</span></span></span><span class="jush-att_js"><span class="jush-op"> </span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/click_event" class="jush-help" target="_blank">onclick</a><span class="jush-op">=</span><span class="jush-att_quo"><span class="jush-op">"</span><span class="jush-js_code"><a href="https://developer.mozilla.org/en/DOM/window.alert" class="jush-help" target="_blank">alert</a><span class="jush-op">(</span></span><span class="jush-js_code"><span class="jush-apo"><span class="jush-op">\'</span><span class="jush-op">\'</span></span>)<span class="jush-op">;</span></span><span class="jush-op">"</span></span></span><span class="jush-op">&gt;</span></span></span>'],
@@ -71,12 +71,11 @@ tests.highlight_html = [
 	['htm', '&lt;a<b>re</b>a <i>href</i>=""&gt;', '<span class="jush"><span class="jush-tag"><span class="jush-op">&lt;</span><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/area" class="jush-help" target="_blank">a<b>re</b>a</a><span class="jush-att"><span class="jush-op"> <i></span><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/area#href" class="jush-help" target="_blank">href</i></a><span class="jush-att_quo"><span class="jush-op">="</span><span class="jush-op">"</span></span></span><span class="jush-op">&gt;</span></span></span>']
 ];
 
-var html = [];
+const html = [];
 
-for (var callback in tests) {
-	for (var i = 0; i < tests[callback].length; i++) {
-		var test = tests[callback][i];
-		var highlighted = jush[callback](test[0], test[1]);
+for (const callback in tests) {
+	for (const test of tests[callback]) {
+		const highlighted = jush[callback](test[0], test[1]);
 		if (highlighted !== test[2]) {
 			console.log(highlighted.replace(/['\\]/g, '\\$&').replace(/\n/g, '\\n'));
 			html.push('<b class="error">error:</b>');
@@ -86,26 +85,25 @@ for (var callback in tests) {
 }
 
 // MariaDB flavor - Adminer's syntaxHighlighting() replaces the base URL at runtime
-var mariaTests = [
+const mariaTests = [
 	['sql', 'SELECT 1', '<span class="jush"><span class="jush-sql_code"><a href="https://mariadb.com/kb/en/select/" class="jush-help" target="_blank">SELECT</a> <span class="jush-num"><span class="jush-op">1</span></span></span></span>'],
 	['sql', 'AUTO_INCREMENT inet4 CLONE LIMIT', '<span class="jush"><span class="jush-sql_code"><a href="https://mariadb.com/kb/en/auto_increment/" class="jush-help" target="_blank">AUTO_INCREMENT</a> <a href="https://mariadb.com/kb/en/inet4/" class="jush-help" target="_blank">inet4</a> CLONE <a href="https://mariadb.com/kb/en/limit/" class="jush-help" target="_blank">LIMIT</a></span></span>'],
 	['sqlset', 'foreign_key_checks', '<span class="jush"><a href="https://mariadb.com/kb/en/server-system-variables/#foreign_key_checks" class="jush-help" target="_blank">foreign_key_checks</a></span>'],
 	['sqlstatus', 'Aborted_clients', '<span class="jush"><a href="https://mariadb.com/kb/en/server-status-variables/#aborted_clients" class="jush-help" target="_blank">Aborted_clients</a></span>'],
 ];
 
-for (var state of ['sql', 'sqlset', 'sqlstatus']) {
+for (const state of ['sql', 'sqlset', 'sqlstatus']) {
 	jush.urls[state][0] = jush.urls[state][0].replace('dev.mysql.com/doc/mysql', 'mariadb.com/kb');
 }
-for (var i = 0; i < mariaTests.length; i++) {
-	var test = mariaTests[i];
-	var highlighted = jush.highlight(test[0], test[1]);
+for (const test of mariaTests) {
+	const highlighted = jush.highlight(test[0], test[1]);
 	if (highlighted !== test[2]) {
 		console.log(highlighted.replace(/['\\]/g, '\\$&').replace(/\n/g, '\\n'));
 		html.push('<b class="error">error:</b>');
 	}
 	html.push('<p><b class="lang">' + test[0] + ' (MariaDB)</b> <code class="jush-' + test[0] + '">' + highlighted + '</code></p>');
 }
-for (var state of ['sql', 'sqlset', 'sqlstatus']) {
+for (const state of ['sql', 'sqlset', 'sqlstatus']) {
 	jush.urls[state][0] = jush.urls[state][0].replace('mariadb.com/kb', 'dev.mysql.com/doc/mysql');
 }
 

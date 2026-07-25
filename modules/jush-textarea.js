@@ -2,15 +2,15 @@ jush.textarea = (function () {
 	//! IE sometimes inserts empty <p> in start of a string when newline is entered inside
 
 	function findSelPos(pre) {
-		var sel = getSelection();
+		const sel = getSelection();
 		if (sel.rangeCount) {
-			var range = sel.getRangeAt(0);
+			const range = sel.getRangeAt(0);
 			return findPosition(pre, range.startContainer, range.startOffset);
 		}
 	}
 
 	function findPosition(el, container, offset) {
-		var pos = { pos: 0 };
+		const pos = { pos: 0 };
 		findPositionRecurse(el, container, offset, pos);
 		return pos.pos;
 	}
@@ -23,7 +23,7 @@ jush.textarea = (function () {
 			}
 			pos.pos += child.textContent.length;
 		} else if (child == container) {
-			for (var i = 0; i < offset; i++) {
+			for (let i = 0; i < offset; i++) {
 				findPositionRecurse(child.childNodes[i], container, offset, pos);
 			}
 			return true;
@@ -31,7 +31,7 @@ jush.textarea = (function () {
 			if (/^(br|div)$/i.test(child.tagName)) {
 				pos.pos++;
 			}
-			for (var i = 0; i < child.childNodes.length; i++) {
+			for (let i = 0; i < child.childNodes.length; i++) {
 				if (findPositionRecurse(child.childNodes[i], container, offset, pos)) {
 					return true;
 				}
@@ -53,7 +53,7 @@ jush.textarea = (function () {
 			}
 			pos.pos -= child.textContent.length;
 		} else {
-			for (var i = 0; i < child.childNodes.length; i++) {
+			for (let i = 0; i < child.childNodes.length; i++) {
 				if (/^br$/i.test(child.childNodes[i].tagName)) {
 					if (!pos.pos) {
 						return { container: child, offset: i };
@@ -63,7 +63,7 @@ jush.textarea = (function () {
 						return { container: child, offset: i };
 					}
 				} else {
-					var result = findOffsetRecurse(child.childNodes[i], pos);
+					const result = findOffsetRecurse(child.childNodes[i], pos);
 					if (result) {
 						return result;
 					}
@@ -74,11 +74,11 @@ jush.textarea = (function () {
 
 	function setSelPos(pre, pos) {
 		if (pos) {
-			var start = findOffset(pre, pos);
+			const start = findOffset(pre, pos);
 			if (start) {
-				var range = document.createRange();
+				const range = document.createRange();
 				range.setStart(start.container, start.offset);
-				var sel = getSelection();
+				const sel = getSelection();
 				sel.removeAllRanges();
 				sel.addRange(range);
 			}
@@ -86,12 +86,12 @@ jush.textarea = (function () {
 	}
 
 	function setText(pre, text, end) {
-		var lang = 'txt';
+		let lang = 'txt';
 		if (text.length < 1e4) { // highlighting is slow with most languages
-			var match = /(^|\s)(?:jush|language)-(\S+)/.exec(pre.jushTextarea.className);
+			const match = /(^|\s)(?:jush|language)-(\S+)/.exec(pre.jushTextarea.className);
 			lang = (match ? match[2] : 'htm');
 		}
-		var html = jush.highlight(lang, text).replace(/\n/g, '<br>');
+		const html = jush.highlight(lang, text).replace(/\n/g, '<br>');
 		setHTML(pre, html, text, end);
 		if (openAc) {
 			openAutocomplete(pre);
@@ -146,18 +146,18 @@ jush.textarea = (function () {
 		}
 
 		if (ctrl && !event.altKey) {
-			var isUndo = (event.keyCode == 90); // 90 - z
-			var isRedo = (event.keyCode == 89 || (event.keyCode == 90 && event.shiftKey)); // 89 - y
+			const isUndo = (event.keyCode == 90); // 90 - z
+			const isRedo = (event.keyCode == 89 || (event.keyCode == 90 && event.shiftKey)); // 89 - y
 			if (isUndo || isRedo) {
 				if (isRedo) {
 					if (this.jushUndoPos + 1 < this.jushUndo.length) {
 						this.jushUndoPos++;
-						var undo = this.jushUndo[this.jushUndoPos];
+						const undo = this.jushUndo[this.jushUndoPos];
 						setText(this, undo.text, undo.end)
 					}
 				} else if (this.jushUndoPos >= 0) {
 					this.jushUndoPos--;
-					var undo = this.jushUndo[this.jushUndoPos] || { html: '', text: '' };
+					const undo = this.jushUndo[this.jushUndoPos] || { html: '', text: '' };
 					setText(this, undo.text, this.jushUndo[this.jushUndoPos + 1].start);
 				}
 				return false;
@@ -268,14 +268,14 @@ jush.textarea = (function () {
 		}
 	}
 
-	var forceNewUndo = true;
+	let forceNewUndo = true;
 
 	function highlight(pre) {
-		var start = pre.lastPos;
+		const start = pre.lastPos;
 		pre.lastPos = undefined;
-		var innerHTML = pre.innerHTML;
+		let innerHTML = pre.innerHTML;
 		if (innerHTML != pre.lastHTML) {
-			var end = findSelPos(pre);
+			let end = findSelPos(pre);
 			innerHTML = innerHTML.replace(/<br>((<\/[^>]+>)*<\/?div>)(?!$)/gi, function (all, rest) {
 				if (end) {
 					end--;
