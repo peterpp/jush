@@ -5,8 +5,8 @@ jush.tr.sqlitestatus = { _0: /$/ };
 
 jush.urls.sqlite_sqliteset = 'https://www.sqlite.org/$key';
 
-jush.slugs.sqlite = function (name) { return name.toLowerCase().replace(/\s+/g, ''); };
-jush.slugs.sqliteset = function (name) { return name.toLowerCase(); };
+jush.slugs.sqlite = name => name.toLowerCase().replace(/\s+/g, '');
+jush.slugs.sqliteset = name => name.toLowerCase();
 jush.slugs.sqlitestatus = jush.slugs.sqliteset;
 
 jush.build_links2('sqlite', 'https://www.sqlite.org/$key', /(\b)/, /(\b)/gi, {

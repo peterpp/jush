@@ -60,7 +60,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 		const inject = { };
 		let pos = 0;
 		let last_offset = 0;
-		original.replace(/(&[^;]+;)|(?:<[^>]+>)+/g, function (str, entity, offset) {
+		original.replace(/(&[^;]+;)|(?:<[^>]+>)+/g, (str, entity, offset) => {
 			pos += (offset - last_offset) + (entity ? 1 : 0);
 			if (!entity) {
 				inject[pos] = str;
@@ -69,7 +69,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 		});
 
 		pos = 0;
-		highlighted = highlighted.replace(/([^&<]*)(?:(&[^;]+;)|(?:<[^>]+>)+|$)/g, function (str, text, entity) {
+		highlighted = highlighted.replace(/([^&<]*)(?:(&[^;]+;)|(?:<[^>]+>)+|$)/g, (str, text, entity) => {
 			for (let i = text.length; i >= 0; i--) {
 				if (inject[pos + i]) {
 					str = str.substr(0, i) + inject[pos + i] + str.substr(i);
@@ -93,7 +93,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 			tab += ' ';
 		}
 		let i = 0;
-		const highlight = function () {
+		const highlight = () => {
 			const start = new Date();
 			while (i < pre.length) {
 				const match = /(^|\s)(?:jush|language(?=-\S))($|\s|-(\S+))/.exec(pre[i].className); // https://www.w3.org/TR/html5/text-level-semantics.html#the-code-element
@@ -198,7 +198,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 		for (const k in tr1) {
 			let in_bra = false;
 			subpatterns.push(k);
-			const s = tr1[k].source.replace(/\\.|\((?!\?)|\[|]|([a-z])(?:-([a-z]))?/gi, function (str, match1, match2) {
+			const s = tr1[k].source.replace(/\\.|\((?!\?)|\[|]|([a-z])(?:-([a-z]))?/gi, (str, match1, match2) => {
 				// count capturing subpatterns
 				if (str == (in_bra ? ']' : '[')) {
 					in_bra = !in_bra;
@@ -318,7 +318,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 				if (/^(att_js|att_css|att_http)$/.test(prev_state)) {
 					const g = (states[i+1] == 'att_quo' ? this.htmlspecialchars_quo : (states[i+1] == 'att_apo' ? this.htmlspecialchars_apo : this.htmlspecialchars_quo_apo));
 					child_states.unshift(prev_state == 'att_js' ? 'js' : prev_state.substr(4));
-					s_states = this.highlight_states(child_states, this.html_entity_decode(s), true, function (string) { return f(g(string)); });
+					s_states = this.highlight_states(child_states, this.html_entity_decode(s), true, string => f(g(string)));
 				} else if (prev_state && child_states) {
 					child_states.unshift(prev_state);
 					s_states = this.highlight_states(child_states, s, true, f);
@@ -429,7 +429,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 	* @return string
 	*/
 	html_entity_decode: function (string) {
-		return string.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&nbsp;/g, '\u00A0').replace(/&#(?:([0-9]+)|x([0-9a-f]+));/gi, function (str, p1, p2) { //! named entities
+		return string.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&nbsp;/g, '\u00A0').replace(/&#(?:([0-9]+)|x([0-9a-f]+));/gi, (str, p1, p2) => { //! named entities
 			return String.fromCharCode(p1 ? p1 : parseInt(p2, 16));
 		}).replace(/&amp;/g, '&');
 	},

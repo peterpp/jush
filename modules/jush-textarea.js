@@ -276,7 +276,7 @@ jush.textarea = (function () {
 		let innerHTML = pre.innerHTML;
 		if (innerHTML != pre.lastHTML) {
 			let end = findSelPos(pre);
-			innerHTML = innerHTML.replace(/<br>((<\/[^>]+>)*<\/?div>)(?!$)/gi, function (all, rest) {
+			innerHTML = innerHTML.replace(/<br>((<\/[^>]+>)*<\/?div>)(?!$)/gi, (all, rest) => {
 				if (end) {
 					end--;
 				}

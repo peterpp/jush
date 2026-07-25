@@ -17,7 +17,7 @@
 		result.className = 'jush-' + language;
 		result.innerHTML = jush.highlight(language, source.value);
 	};
-	source.form['language'].onchange = function () {
+	source.form['language'].onchange = () => {
 		value = '';
 		source.oninput();
 	}
