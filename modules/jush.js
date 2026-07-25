@@ -72,7 +72,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 		highlighted = highlighted.replace(/([^&<]*)(?:(&[^;]+;)|(?:<[^>]+>)+|$)/g, (str, text, entity) => {
 			for (let i = text.length; i >= 0; i--) {
 				if (inject[pos + i]) {
-					str = str.substr(0, i) + inject[pos + i] + str.substr(i);
+					str = str.slice(0, i) + inject[pos + i] + str.slice(i);
 					delete inject[pos + i];
 				}
 			}
@@ -86,15 +86,12 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 	* @param mixed tag name or array of HTMLElement
 	* @param number number of spaces for tab, 0 for tab itself, defaults to 4
 	*/
-	highlight_tag: function (tag, tab_width) {
-		const pre = (typeof tag == 'string' ? Array.prototype.slice.call(document.getElementsByTagName(tag)) : tag);
-		let tab = '';
-		for (let i = (tab_width !== undefined ? tab_width : 4); i--; ) {
-			tab += ' ';
-		}
+	highlight_tag: function (tag, tab_width = 4) {
+		const pre = (typeof tag == 'string' ? [...document.getElementsByTagName(tag)] : tag);
+		const tab = ' '.repeat(tab_width);
 		let i = 0;
 		const highlight = () => {
-			const start = new Date();
+			const start = Date.now();
 			while (i < pre.length) {
 				const match = /(^|\s)(?:jush|language(?=-\S))($|\s|-(\S+))/.exec(pre[i].className); // https://www.w3.org/TR/html5/text-level-semantics.html#the-code-element
 				if (match) {
@@ -102,7 +99,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 					pre[i].innerHTML = '<span class="jush"><span class="jush-' + language + '">' + jush.highlight_html(language, pre[i].innerHTML.replace(/\t/g, tab.length ? tab : '\t')) + '</span></span>'; // span - enable style for class="language-"
 				}
 				i++;
-				if (jush.timeout && window.setTimeout && (new Date() - start) > jush.timeout) {
+				if (jush.timeout && window.setTimeout && (Date.now() - start) > jush.timeout) {
 					window.setTimeout(highlight, 100);
 					break;
 				}
@@ -180,7 +177,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 			for (const url in this.custom_links[state]) {
 				s = s.replace(this.custom_links[state][url], function (str) {
 					const offset = arguments[arguments.length - 2];
-					if (offset + str.length > s.length - append.length || /<[^>]*$/.test(s.substr(0, offset)) || /^[^<]*<\/a>/.test(s.substr(offset))) {
+					if (offset + str.length > s.length - append.length || /<[^>]*$/.test(s.slice(0, offset)) || /^[^<]*<\/a>/.test(s.slice(offset))) {
 						return str; // don't create links inside tags or in the appended context
 					}
 					return '<a href="' + jush.htmlspecialchars_quo(url.replace('$&', encodeURIComponent(str))) + '" class="jush-custom">' + str + '</a>' // not create_link() - ignores create_links
@@ -292,7 +289,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 				child_states.unshift(state.replace(/^[^_]+_/, ''));
 				s_states = this.highlight_states(child_states, s, true);
 			} else if ((state == 'php_quo' || state == 'php_apo') && /^(php_php|php_sql|php_sqlite|php_pgsql|php_mssql|php_oracle|php_phpini|php_http|php_mail)$/.test(prev_state)) {
-				child_states.unshift(prev_state.substr(4));
+				child_states.unshift(prev_state.slice(4));
 				s_states = this.highlight_states(child_states, this.stripslashes(s), true, (state == 'php_apo' ? this.addslashes_apo : this.addslashes_quo));
 			} else if (key == 'php_halt2') {
 				child_states.unshift('htm');
@@ -316,7 +313,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 				s = this.stripslashes(s);
 				if (/^(att_js|att_css|att_http)$/.test(prev_state)) {
 					const g = (states[i+1] == 'att_quo' ? this.htmlspecialchars_quo : (states[i+1] == 'att_apo' ? this.htmlspecialchars_apo : this.htmlspecialchars_quo_apo));
-					child_states.unshift(prev_state == 'att_js' ? 'js' : prev_state.substr(4));
+					child_states.unshift(prev_state == 'att_js' ? 'js' : prev_state.slice(4));
 					s_states = this.highlight_states(child_states, this.html_entity_decode(s), true, string => f(g(string)));
 				} else if (prev_state && child_states) {
 					child_states.unshift(prev_state);
@@ -331,7 +328,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 			}
 			s = s_states[0];
 			child_states = s_states[1];
-			s = this.keywords_links(state, s, text.substr(match.index, 2)); // 2 - lookahead for closing quote plus parenthesis
+			s = this.keywords_links(state, s, text.slice(match.index, match.index + 2)); // 2 - lookahead for closing quote plus parenthesis
 			ret.push(s);
 
 			s = text.substring(division, match.index + match[0].length);
@@ -383,7 +380,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 					s = this.create_link(this.urls[state].replace(/\$key/, this.last_class) + '.' + s.toLowerCase().replace(/^__/, ''), s, (title ? ' title="' + this.htmlspecialchars_quo(title) + '"' : ''));
 				}
 				ret.push(s);
-				for (let i = Math.min(states.length, +key.substr(1)); i--; ) {
+				for (let i = Math.min(states.length, +key.slice(1)); i--; ) {
 					ret.push('</span>');
 					states.pop();
 				}

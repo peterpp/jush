@@ -36,7 +36,7 @@ jush.style('jush.css');
 jush.style('jush-dark.css', '(prefers-color-scheme: dark)');
 if (location.hash) {
 	const source = document.getElementById('source');
-	source.value = decodeURIComponent(location.hash.substr(1));
+	source.value = decodeURIComponent(location.hash.slice(1));
 	highlight(source.value);
 }
 </script>
