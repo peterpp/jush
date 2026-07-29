@@ -10,7 +10,7 @@ Highlights the full stack of PHP application starting with HTML, PHP, SQL and Ja
 ## Features
 
 - Highlights and links documentation in spaghetti code like nothing else: `<?php mysql_query("SELECT 1"); ?>`
-- Supported languages: everything related to PHP: HTML5, JS, CSS 3, SQL including variables (multiple dialects), `php.ini` directives, HTTP and e-mail headers, Apache config. Anything could be embedded into each other, e.g. `header("Content-Type: text/html")` or `color: expression(parentNode.style.color)`.
+- Supported languages: everything related to PHP: HTML5, JS, JSON, CSS 3, SQL including variables (multiple dialects), `php.ini` directives, HTTP and e-mail headers, Apache config. Anything could be embedded into each other, e.g. `header("Content-Type: text/html")` or `color: expression(parentNode.style.color)`.
 - Allows using HTML tags in source code (could be used for pointing out important parts): `echo "This part is <b>important</b>."`. Produces overlapping HTML tags in this case though.
 - Performance is a priority.
 - `<textarea>` [syntax highlight](textarea.html).

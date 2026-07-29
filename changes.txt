@@ -3,6 +3,7 @@ Require ES6
 Highlight keywords leaving the state (e.g. MySQL DO)
 MySQL: Link the longest matching phrase
 JSDoc: Link tags to jsdoc.app, add new tags
+Highlight JSON
 
 JUSH 3.0.0:
 Convert jush-help from Windows Script Host to Node
