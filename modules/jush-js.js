@@ -21,7 +21,7 @@ jush.links.js_write = { 'document': /^(write|writeln)$/ };
 jush.links.js_http = { 'method': /^(setRequestHeader|getResponseHeader)$/ };
 
 jush.slugs.js = name => name.replace(/\./g, '/');
-jush.slugs.js_doc = name => name.replace(/^\W*(.)/, (match, p1) => p1.toUpperCase());
+jush.slugs.js_doc = name => name.replace(/^@/, '');
 
 jush.build_links2('js', 'https://developer.mozilla.org/en/$key', /(\b)/, /(\b)/g, {
 	'JavaScript/Reference/Global_Objects/$1': /(ArrayBuffer\.isView|Array\.from|Array\.fromAsync|Array\.isArray|Array\.of|Atomics\.add|Atomics\.and|Atomics\.compareExchange|Atomics\.exchange|Atomics\.isLockFree|Atomics\.load|Atomics\.notify|Atomics\.or|Atomics\.pause|Atomics\.store|Atomics\.sub|Atomics\.wait|Atomics\.waitAsync|Atomics\.xor|BigInt\.asIntN|BigInt\.asUintN|Date\.UTC|Date\.now|Date\.parse|Error\.captureStackTrace|Error\.isError|Error\.stackTraceLimit|Intl\.getCanonicalLocales|Intl\.supportedValuesOf|Iterator\.concat|Iterator\.from|Iterator\.zip|Iterator\.zipKeyed|JSON\.isRawJSON|JSON\.parse|JSON\.rawJSON|JSON\.stringify|Map\.groupBy|Math\.E|Math\.LN10|Math\.LN2|Math\.LOG10E|Math\.LOG2E|Math\.PI|Math\.SQRT1_2|Math\.SQRT2|Math\.abs|Math\.acos|Math\.acosh|Math\.asin|Math\.asinh|Math\.atan|Math\.atan2|Math\.atanh|Math\.cbrt|Math\.ceil|Math\.clz32|Math\.cos|Math\.cosh|Math\.exp|Math\.expm1|Math\.f16round|Math\.floor|Math\.fround|Math\.hypot|Math\.imul|Math\.log|Math\.log10|Math\.log1p|Math\.log2|Math\.max|Math\.min|Math\.pow|Math\.random|Math\.round|Math\.sign|Math\.sin|Math\.sinh|Math\.sqrt|Math\.sumPrecise|Math\.tan|Math\.tanh|Math\.trunc|Number\.EPSILON|Number\.MAX_SAFE_INTEGER|Number\.MAX_VALUE|Number\.MIN_SAFE_INTEGER|Number\.MIN_VALUE|Number\.NEGATIVE_INFINITY|Number\.NaN|Number\.POSITIVE_INFINITY|Number\.isFinite|Number\.isInteger|Number\.isNaN|Number\.isSafeInteger|Number\.parseFloat|Number\.parseInt|Object\.assign|Object\.create|Object\.defineProperties|Object\.defineProperty|Object\.entries|Object\.freeze|Object\.fromEntries|Object\.getOwnPropertyDescriptor|Object\.getOwnPropertyDescriptors|Object\.getOwnPropertyNames|Object\.getOwnPropertySymbols|Object\.getPrototypeOf|Object\.groupBy|Object\.hasOwn|Object\.is|Object\.isExtensible|Object\.isFrozen|Object\.isSealed|Object\.keys|Object\.preventExtensions|Object\.seal|Object\.setPrototypeOf|Object\.values|Promise\.all|Promise\.allSettled|Promise\.any|Promise\.race|Promise\.reject|Promise\.resolve|Promise\.try|Promise\.withResolvers|Proxy\.revocable|Reflect\.apply|Reflect\.construct|Reflect\.defineProperty|Reflect\.deleteProperty|Reflect\.get|Reflect\.getOwnPropertyDescriptor|Reflect\.getPrototypeOf|Reflect\.has|Reflect\.isExtensible|Reflect\.ownKeys|Reflect\.preventExtensions|Reflect\.set|Reflect\.setPrototypeOf|RegExp\.escape|RegExp\.input|RegExp\.lastMatch|RegExp\.lastParen|RegExp\.leftContext|RegExp\.n|RegExp\.rightContext|String\.fromCharCode|String\.fromCodePoint|String\.raw|Symbol\.asyncDispose|Symbol\.asyncIterator|Symbol\.dispose|Symbol\.for|Symbol\.hasInstance|Symbol\.isConcatSpreadable|Symbol\.iterator|Symbol\.keyFor|Symbol\.match|Symbol\.matchAll|Symbol\.replace|Symbol\.search|Symbol\.species|Symbol\.split|Symbol\.toPrimitive|Symbol\.toStringTag|Symbol\.unscopables|TypedArray\.BYTES_PER_ELEMENT|TypedArray\.from|TypedArray\.of|Uint8Array\.fromBase64|Uint8Array\.fromHex|AggregateError|Array|ArrayBuffer|AsyncDisposableStack|AsyncFunction|AsyncGenerator|AsyncGeneratorFunction|AsyncIterator|Atomics|BigInt|BigInt64Array|BigUint64Array|Boolean|DataView|Date|DisposableStack|Error|EvalError|FinalizationRegistry|Float16Array|Float32Array|Float64Array|Function|Generator|GeneratorFunction|Infinity|Int16Array|Int32Array|Int8Array|InternalError|Intl|Iterator|JSON|Map|Math|NaN|Number|Object|Promise|Proxy|RangeError|ReferenceError|Reflect|RegExp|Set|SharedArrayBuffer|String|SuppressedError|Symbol|SyntaxError|Temporal|TypeError|TypedArray|URIError|Uint16Array|Uint32Array|Uint8Array|Uint8ClampedArray|WeakMap|WeakRef|WeakSet|decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|escape|eval|globalThis|isFinite|isNaN|parseFloat|parseInt|undefined|unescape)/,
@@ -46,8 +46,24 @@ jush.build_links2('js', 'https://developer.mozilla.org/en/$key', /(\b)/, /(\b)/g
 	'JavaScript/Reference/Global_Objects/String/$1': /(?<=\.)(anchor|at|big|blink|bold|charAt|charCodeAt|codePointAt|concat|endsWith|fixed|fontcolor|fontsize|includes|indexOf|isWellFormed|italics|lastIndexOf|length|link|localeCompare|match|matchAll|normalize|padEnd|padStart|repeat|replace|replaceAll|search|slice|small|split|startsWith|strike|sub|substr|substring|sup|toLocaleLowerCase|toLocaleUpperCase|toLowerCase|toString|toUpperCase|toWellFormed|trim|trimEnd|trimStart|valueOf)/,
 }); // collisions: bgColor, height, width, length, name, open
 
-jush.build_links2('js_doc', 'https://code.google.com/p/jsdoc-toolkit/wiki/Tag$key', /(^[ \t]*|\n\s*\*\s*|(?={))/, /(\b)/g, {
-	'$1': /(@(?:augments|author|borrows|class|constant|constructor|constructs|default|deprecated|description|event|example|field|fileOverview|function|ignore|inner|lends|memberOf|name|namespace|param|private|property|public|requires|returns|see|since|static|throws|type|version)|\{@link)/,
-	'Param': /(@argument)/,
-	'Augments': /(@extends)/,
+jush.build_links2('js_doc', 'https://jsdoc.app/$key', /(^[ \t]*|\n\s*\*\s*|(?={))/, /(\b)/g, {
+	'tags-$1': /(@(?:abstract|access|alias|async|augments|author|borrows|callback|class|classdesc|constant|constructs|copyright|default|deprecated|description|enum|event|example|exports|external|file|fires|function|generator|global|hideconstructor|ignore|implements|inheritdoc|inner|instance|interface|kind|lends|license|listens|member|memberof|mixes|mixin|module|name|namespace|override|package|param|private|property|protected|public|readonly|requires|returns|see|since|static|summary|this|throws|todo|tutorial|type|typedef|variation|version|yields))/,
+	'tags-abstract': /(@virtual)/,
+	'tags-augments': /(@extends)/,
+	'tags-class': /(@constructor)/,
+	'tags-constant': /(@const)/,
+	'tags-default': /(@defaultvalue)/,
+	'tags-description': /(@desc)/,
+	'tags-external': /(@host)/,
+	'tags-file': /(@fileoverview|@overview)/,
+	'tags-fires': /(@emits)/,
+	'tags-function': /(@func|@method)/,
+	'tags-inline-link': /(\{@link|\{@linkcode|\{@linkplain)/,
+	'tags-inline-tutorial': /(\{@tutorial)/,
+	'tags-member': /(@var)/,
+	'tags-param': /(@arg|@argument)/,
+	'tags-property': /(@prop)/,
+	'tags-returns': /(@return)/,
+	'tags-throws': /(@exception)/,
+	'tags-yields': /(@yield)/,
 });

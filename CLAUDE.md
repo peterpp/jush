@@ -27,6 +27,7 @@ It loads the `modules/jush*.js` files directly plus `tests.js`, so no compilatio
 The CLI scripts in `update/` regenerate the linked identifiers in `modules/jush-*.js` (and the tooltips in `jush-api.js` for PHP and JS) from official documentation sources.
 Each takes a path to a local checkout of its source, e.g. `php update/js.php path/to/mdn-content`:
 - `htm.php`, `css.php`, `js.php`, `http.php` – a checkout of https://github.com/mdn/content
+- `js_doc.php` – a checkout of https://github.com/jsdoc/jsdoc.github.io
 - `sqlite.php` – a checkout of https://sqlite.org/docsrc/
 - `pgsql.php` – a checkout of the latest stable branch (`REL_*_STABLE`) of https://github.com/postgres/postgres
 - `sql.php` – two arguments: a cache directory for the MySQL online manual's index pages (fetched from dev.mysql.com on miss; bump `$mysql_version` in the script for a new release) and a checkout of https://github.com/mariadb-corporation/mariadb-docs; regenerates the marker-delimited regions plus the keywords, sqlset and sqlstatus lists in `modules/jush-sql.js`, keeping the hand-crafted entries and updating their `(?:...)` function groups in place
