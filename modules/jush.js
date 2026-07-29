@@ -149,8 +149,16 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 						let key = url[i-1];
 						if (link_key) {
 							key = link_key(key, url);
-							if (key == '-') {
-								return str; // the other vendor doesn't know this name at all
+							if (key == '-') { // the other vendor doesn't know this phrase, it may still know its beginning
+								const last_word = arguments[i].search(/\s+\S*$/);
+								if (last_word < 0) {
+									return str;
+								}
+								return (match1 ? match1 : '')
+									+ jush.keywords_links(state, arguments[i].substring(0, last_word))
+									+ arguments[i].substring(last_word)
+									+ (arguments[arguments.length - 3] ? arguments[arguments.length - 3] : '')
+								;
 							}
 						}
 						let link = (/^https?:/.test(key) || !key ? key : url[0].replace(/\$key/g, key));
@@ -332,7 +340,9 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 			ret.push(s);
 
 			s = text.substring(division, match.index + match[0].length);
-			s = (m.length < 3 ? (s ? '<span class="jush-op">' + this.htmlspecialchars(escape ? escape(s) : s) + '</span>' : '') : (m[1] ? '<span class="jush-op">' + this.htmlspecialchars(escape ? escape(m[1]) : m[1]) + '</span>' : '') + this.htmlspecialchars(escape ? escape(m[2]) : m[2]) + (m[3] ? '<span class="jush-op">' + this.htmlspecialchars(escape ? escape(m[3]) : m[3]) + '</span>' : ''));
+			// a keyword can leave the state (e.g. DO in MySQL) - link it instead of printing it as an operator
+			const keyword = (out && /\w/.test(s) ? this.keywords_links(state, this.htmlspecialchars(escape ? escape(s) : s)) : '');
+			s = (/<a/.test(keyword) ? keyword : (m.length < 3 ? (s ? '<span class="jush-op">' + this.htmlspecialchars(escape ? escape(s) : s) + '</span>' : '') : (m[1] ? '<span class="jush-op">' + this.htmlspecialchars(escape ? escape(m[1]) : m[1]) + '</span>' : '') + this.htmlspecialchars(escape ? escape(m[2]) : m[2]) + (m[3] ? '<span class="jush-op">' + this.htmlspecialchars(escape ? escape(m[3]) : m[3]) + '</span>' : '')));
 			if (!out) {
 				if (this.links && this.links[key] && m[2]) {
 					if (/^tag/.test(key)) {

@@ -137,6 +137,131 @@ function unknown_key($phrase, array $keywords) {
 	return (array_diff(explode(' ', $phrase), $keywords) ? '-' : '');
 }
 
+// Get the top-level alternatives of the leading capturing subpattern and the rest of the source
+function entry_alternatives($source) {
+	$alternatives = [];
+	$depth = 0;
+	$last = 0;
+	for ($i = 0; $i < strlen($source); $i++) {
+		$c = $source[$i];
+		if ($c == '\\') {
+			$i++;
+		} elseif ($c == '(') {
+			if (!$depth++) {
+				$last = $i + 1;
+			}
+		} elseif ($c == ')') {
+			if (!--$depth) {
+				$alternatives[] = substr($source, $last, $i - $last);
+				return [$alternatives, substr($source, $i + 1)];
+			}
+		} elseif ($c == '|' && $depth == 1) {
+			$alternatives[] = substr($source, $last, $i - $last);
+			$last = $i + 1;
+		}
+	}
+	fwrite(STDERR, "Can't parse the entry /$source/\n");
+	exit(1);
+}
+
+// Whether a phrase of the first list is a prefix of a phrase of the second one
+function prefix_of(array $phrases, array $others) {
+	foreach ($phrases as $phrase) {
+		foreach ($others as $other) {
+			if (strpos($other, "$phrase ") === 0) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+// links2 is a single alternation matching the first alternative, not the longest one, so a phrase must
+// not precede a longer phrase starting with it; phrases_regexp() sorts them inside one entry,
+// this orders the entries so that it holds across them too
+function order_entries(array $entries) { // [line, phrases]
+	$return = [];
+	while ($entries) {
+		foreach ($entries as $i => $entry) {
+			foreach ($entries as $j => $other) {
+				if ($i != $j && prefix_of($entry[1], $other[1])) {
+					continue 2; // a longer phrase is still waiting
+				}
+			}
+			$return[] = $entry;
+			unset($entries[$i]);
+			continue 2;
+		}
+		fwrite(STDERR, "Statement entries shadow each other in a cycle: " . implode(', ', array_map(function ($entry) {
+			return implode('|', $entry[1]);
+		}, $entries)) . "\n");
+		return array_merge($return, $entries);
+	}
+	return $return;
+}
+
+// The entries which can't be ordered - a hand-maintained phrase after the generated region - get
+// a lookahead rejecting the rest of the longer phrases instead
+function set_shadow_lookaheads($jush, $block_key) {
+	list($block, $start, $end) = find_block($jush, $block_key);
+	$lines = explode("\n", $block);
+	$alternatives = []; // [line, position in the entry, phrase or '' when it can't take a lookahead]
+	$last_phrase = []; // phrase => index of its last alternative
+	foreach ($lines as $line => $source) {
+		if (!preg_match("~^\t'[^']*': /(.*)/,$~", $source, $match)) {
+			continue;
+		}
+		foreach (entry_alternatives($match[1])[0] as $position => $alternative) {
+			$alternative = preg_replace('~\(\?!\\\\s\+\(\?:[^)]*\)\)~', '', $alternative); // drop the lookahead of the previous run
+			// only a plain phrase optionally followed by lookaheads can take one more
+			$phrase = (preg_match('~^([A-Z][A-Z0-9_]*(?:\\\\s\+[A-Z][A-Z0-9_]*)*)(|\(\?[=!].*)$~s', $alternative, $match2)
+				? str_replace('\\s+', ' ', $match2[1])
+				: '');
+			foreach (($phrase != '' ? [$phrase] : expand_phrases(preg_replace('~\(\?[=!].*~s', '', $alternative))) as $name) {
+				if (preg_match('~^[A-Z][A-Z0-9_ ]*$~', $name)) {
+					$last_phrase[$name] = count($alternatives);
+				}
+			}
+			$alternatives[] = [$line, $position, $phrase];
+		}
+	}
+
+	$lookaheads = [];
+	foreach ($alternatives as $index => list($line, $position, $phrase)) {
+		$rests = [];
+		foreach ($last_phrase as $name => $last) {
+			if ($phrase != '' && $last > $index && strpos($name, "$phrase ") === 0) {
+				// the whole rest, not just the next word - PARTITION must stay linked in PARTITION BY x
+				$rests[str_replace(' ', '\\s+', substr($name, strlen($phrase) + 1))] = true;
+			}
+		}
+		if ($rests) {
+			$rests = array_keys($rests);
+			sort($rests);
+			$lookaheads[$line][$position] = '(?!\\s+(?:' . implode('|', $rests) . '))';
+			fwrite(STDERR, "Shadowed: $phrase before " . implode(', ', str_replace('\\s+', ' ', $rests)) . "\n");
+		}
+	}
+
+	foreach ($lines as $line => $source) {
+		if (!preg_match("~^(\t'[^']*': /)(.*)(/,)$~", $source, $match)) {
+			continue;
+		}
+		list($entry, $rest) = entry_alternatives($match[2]);
+		foreach ($entry as $position => $alternative) {
+			$alternative = preg_replace('~\(\?!\\\\s\+\(\?:[^)]*\)\)~', '', $alternative);
+			$lookahead = ($lookaheads[$line][$position] ?? '');
+			$entry[$position] = ($lookahead == '' ? $alternative : preg_replace(
+				'~^([A-Z][A-Z0-9_]*(?:\\\\s\+[A-Z][A-Z0-9_]*)*)~',
+				'$1' . str_replace('\\', '\\\\', $lookahead),
+				$alternative
+			));
+		}
+		$lines[$line] = $match[1] . '(' . implode('|', $entry) . ')' . $rest . $match[3];
+	}
+	return substr_replace($jush, implode("\n", $lines), $start, $end - $start);
+}
+
 
 // MariaDB inventory
 
@@ -360,12 +485,12 @@ foreach (array_keys($mysql_statements + $maria_statements) as $phrase) {
 	}
 }
 
-// Rewrite the statements region: exceptions first (a longer phrase must win over its prefix),
-// then MariaDB-only statements and functions, MySQL-only statements and the shared list
-$lines = '';
+// Rewrite the statements region: the exceptions, MariaDB-only statements and functions,
+// MySQL-only statements and the shared list, ordered so that a longer phrase wins over its prefix
+$entries = []; // [line, phrases]
 ksort($statement_exceptions);
 foreach ($statement_exceptions as $key => $phrases) {
-	$lines .= "\t'$key': /(" . schema_regexp(phrases_regexp($phrases)) . ")(?!\\()/,\n";
+	$entries[] = ["\t'$key': /(" . schema_regexp(phrases_regexp($phrases)) . ")(?!\\()/,\n", $phrases];
 }
 $maria_only = ($maria_only_statements ? schema_regexp(phrases_regexp($maria_only_statements)) . '(?!\\()' : '');
 if ($maria_only_functions) {
@@ -373,12 +498,13 @@ if ($maria_only_functions) {
 	$maria_only .= ($maria_only ? '|' : '') . '(?:' . implode('|', $maria_only_functions) . ')(?=\\s*\\(|$)';
 }
 if ($maria_only != '') {
-	$lines .= "\t'- \$1/': /($maria_only)/,\n";
+	$entries[] = ["\t'- \$1/': /($maria_only)/,\n", $maria_only_statements];
 }
 if ($mysql_only_statements) {
-	$lines .= "\t'\$1.html -': /(" . schema_regexp(phrases_regexp($mysql_only_statements)) . ")(?!\\()/,\n";
+	$entries[] = ["\t'\$1.html -': /(" . schema_regexp(phrases_regexp($mysql_only_statements)) . ")(?!\\()/,\n", $mysql_only_statements];
 }
-$lines .= "\t'\$1.html': /(" . schema_regexp(phrases_regexp($shared_statements)) . ")(?!\\()/,\n";
+$entries[] = ["\t'\$1.html': /(" . schema_regexp(phrases_regexp($shared_statements)) . ")(?!\\()/,\n", $shared_statements];
+$lines = implode('', array_column(order_entries($entries), 0));
 list($jush, $old_region) = set_region($jush, 'statements', $lines);
 $old_statements = [];
 foreach (block_entries($old_region) as $regexp) {
@@ -510,6 +636,8 @@ foreach (array_keys(block_entries($block)) as $key) {
 }
 report_diff('status pages', array_unique($old_pages), array_keys($maria_pages));
 $jush = substr_replace($jush, rtrim($lines, "\n"), $start, $end - $start);
+
+$jush = set_shadow_lookaheads($jush, 'sql');
 
 file_put_contents($jush_file, $jush);
 fwrite(STDERR, sprintf(
