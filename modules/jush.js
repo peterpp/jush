@@ -147,6 +147,11 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 				for (let i=arguments.length - 4; i > 1; i--) {
 					if (arguments[i]) {
 						let key = url[i-1];
+						let prefix = ''; // groups of the same path before the linked text, e.g. the dot in .at
+						for (let j=i - 1; j > 1 && url[j-1] == url[i-1]; j--) {
+							prefix = (arguments[j] || '') + prefix;
+						}
+						prefix = (match1 ? match1 : '') + prefix;
 						if (link_key) {
 							key = link_key(key, url);
 							if (key == '-') { // the other vendor doesn't know this phrase, it may still know its beginning
@@ -154,7 +159,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 								if (last_word < 0) {
 									return str;
 								}
-								return (match1 ? match1 : '')
+								return prefix
 									+ jush.keywords_links(state, arguments[i].substring(0, last_word))
 									+ arguments[i].substring(last_word)
 									+ (arguments[arguments.length - 3] ? arguments[arguments.length - 3] : '')
@@ -167,7 +172,7 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 						if (jush.api[state]) {
 							title = jush.api[state][(state == 'js' ? arguments[i] : arguments[i].toLowerCase())];
 						}
-						return (match1 ? match1 : '') + jush.create_link(link, arguments[i], (title ? ' title="' + jush.htmlspecialchars_quo(title) + '"' : '')) + (arguments[arguments.length - 3] ? arguments[arguments.length - 3] : '');
+						return prefix + jush.create_link(link, arguments[i], (title ? ' title="' + jush.htmlspecialchars_quo(title) + '"' : '')) + (arguments[arguments.length - 3] ? arguments[arguments.length - 3] : '');
 					}
 				}
 			});
@@ -228,7 +233,16 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 		this.urls[key] = [url];
 		const regexps = [];
 		for (const path in paths) {
-			this.urls[key].push(path);
+			let in_bra = false;
+			paths[path].source.replace(/\\.|\[|]|\((?!\?)/g, str => { // count capturing subpatterns - a path may capture a prefix before the linked text, e.g. the dot in .at
+				if (str == (in_bra ? ']' : '[')) {
+					in_bra = !in_bra;
+				}
+				if (str == '(' && !in_bra) {
+					this.urls[key].push(path);
+				}
+				return str;
+			});
 			regexps.push(paths[path].source);
 		}
 		this.links2[key] = new RegExp(prefix.source + '(?:' + regexps.join('|') + ')' + suffix.source, suffix.flags);

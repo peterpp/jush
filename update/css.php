@@ -34,6 +34,6 @@ foreach (read_dirs("$reference/selectors") as $dir) {
 $jush = read_file($jush_file);
 $jush = set_list($jush, "jush.links.css_at = {\n\t'@\$val': /^(", ")\$/i", $ats, 'at-rules');
 $jush = set_list($jush, "jush.links.css_val = {\n\t'\$val': /^(", ")\$/i", $properties, 'properties');
-$jush = set_list($jush, "'_colon_\$1': /(?<!::)(", ")/,", $classes, 'pseudo-classes');
-$jush = set_list($jush, "'_doublecolon_\$1': /(?<=::)(", ")/,", $elements, 'pseudo-elements');
+$jush = set_list($jush, "'_colon_\$1': /(", ")/,", $classes, 'pseudo-classes');
+$jush = set_list($jush, "'_doublecolon_\$1': /(:)(", ")/,", $elements, 'pseudo-elements');
 file_put_contents($jush_file, $jush);

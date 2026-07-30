@@ -1,5 +1,6 @@
 JUSH 3.0.1:
 Require ES6
+Fix highlighting in Safari < 16.4 and Firefox < 78
 Highlight keywords leaving the state (e.g. MySQL DO)
 MySQL: Link the longest matching phrase
 JSDoc: Link tags to jsdoc.app, add new tags
