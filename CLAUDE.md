@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-JUSH (JavaScript Syntax Highlighter) highlights the full stack of a PHP web app in the browser: HTML5, PHP, multiple SQL dialects (MySQL, MS SQL, Oracle, PostgreSQL, SQLite, SimpleDB), JavaScript, JSON, CSS3, HTTP headers, php.ini, and Apache config.
+JUSH (JavaScript Syntax Highlighter) highlights the full stack of a PHP web app in the browser: HTML5, PHP, multiple SQL dialects (MySQL, MS SQL, Oracle, PostgreSQL, SQLite, SimpleDB), Redis commands, JavaScript, JSON, CSS3, HTTP headers, php.ini, and Apache config.
 Its distinguishing features are highlighting arbitrarily mixed/embedded languages (PHP inside HTML attributes, SQL inside a PHP string, JS in `onclick=`, etc.) and linking recognized identifiers (functions, keywords) to their official documentation.
 This repo is used as a Git submodule by Adminer (and other projects by the same author) for SQL/PHP highlighting.
 
@@ -30,6 +30,7 @@ Each takes a path to a local checkout of its source, e.g. `php update/js.php pat
 - `js_doc.php` – a checkout of https://github.com/jsdoc/jsdoc.github.io
 - `sqlite.php` – a checkout of https://sqlite.org/docsrc/
 - `pgsql.php` – a checkout of the latest stable branch (`REL_*_STABLE`) of https://github.com/postgres/postgres
+- `redis.php` – a checkout of the latest release branch of https://github.com/redis/redis; the command names come from `src/commands/*.json`, whose filenames are the redis.io doc slugs
 - `sql.php` – two arguments: a cache directory for the MySQL online manual's index pages (fetched from dev.mysql.com on miss; bump `$mysql_version` in the script for a new release) and a checkout of https://github.com/mariadb-corporation/mariadb-docs; regenerates the marker-delimited regions plus the keywords, sqlset and sqlstatus lists in `modules/jush-sql.js`, keeping the hand-crafted entries and updating their `(?:...)` function groups in place
 - `php.php` – a `php.api` file (URL in the script header; path optional, defaults to `./php.api`)
 

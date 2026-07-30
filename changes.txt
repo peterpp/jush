@@ -6,6 +6,7 @@ MySQL: Link the longest matching phrase
 CSS: Fix links to MDN
 JSDoc: Link tags to jsdoc.app, add new tags
 Highlight JSON
+Highlight Redis 8.10
 
 JUSH 3.0.0:
 Convert jush-help from Windows Script Host to Node

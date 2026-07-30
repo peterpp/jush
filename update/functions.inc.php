@@ -47,13 +47,13 @@ function add_api(array &$block, $key, $tooltip) {
 	}
 }
 
-// Turn statement names into regexp alternatives, a phrase before its own prefix (SELECT\s+INTO before SELECT)
+// Turn statement names into regexp alternatives, a phrase before its own prefix (SELECT\s+INTO before SELECT, RESTORE-ASKING before RESTORE)
 function phrases_regexp(array $names) {
 	usort($names, function ($a, $b) {
-		if (strpos($a, "$b ") === 0) {
+		if (strpos($a, "$b ") === 0 || strpos($a, "$b-") === 0) {
 			return -1;
 		}
-		if (strpos($b, "$a ") === 0) {
+		if (strpos($b, "$a ") === 0 || strpos($b, "$a-") === 0) {
 			return 1;
 		}
 		return strcmp($a, $b);

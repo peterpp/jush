@@ -80,6 +80,10 @@ tests.highlight = [
 
 	['simpledb', 'SELECT * FROM domain WHERE id = 1', '<span class="jush"><a href="https://docs.aws.amazon.com/AmazonSimpleDB/latest/DeveloperGuide/QuotingRulesSelect.html" class="jush-help" target="_blank">SELECT</a> * <a target="_blank">FROM</a> domain <a href="https://docs.aws.amazon.com/AmazonSimpleDB/latest/DeveloperGuide/SimpleQueriesSelect.html" class="jush-help" target="_blank">WHERE</a> id = 1</span>'],
 	['igdb', 'POST games; fields *;', '<span class="jush"><a href="https://api-docs.igdb.com/#endpoints" class="jush-help" target="_blank">POST</a> games; <a href="https://api-docs.igdb.com/#fields" class="jush-help" target="_blank">fields</a> *;</span>'],
+
+	['redis', 'GET user:1\nRESTORE-ASKING key 0 dump', '<span class="jush"><a href="https://redis.io/docs/latest/commands/get/" class="jush-help" target="_blank">GET</a> user:1\n<a href="https://redis.io/docs/latest/commands/restore-asking/" class="jush-help" target="_blank">RESTORE-ASKING</a> key 0 dump</span>'],
+	['redis', 'CONFIG SET appendonly "yes"', '<span class="jush"><a href="https://redis.io/docs/latest/commands/config-set/" class="jush-help" target="_blank">CONFIG SET</a> appendonly <span class="jush-quo"><span class="jush-op">"</span>yes<span class="jush-op">"</span></span></span>'],
+	['redis', "SET key 'a\\'b' GET", '<span class="jush"><a href="https://redis.io/docs/latest/commands/set/" class="jush-help" target="_blank">SET</a> key <span class="jush-apo"><span class="jush-op">\'</span>a<span class="jush-esc"><span class="jush-op">\\</span><span class="jush-op">\'</span></span>b<span class="jush-op">\'</span></span> <a href="https://redis.io/docs/latest/commands/get/" class="jush-help" target="_blank">GET</a></span>'], // GET is not a command here but it is linked anyway
 ];
 
 tests.highlight_html = [
