@@ -201,19 +201,36 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 		return s;
 	},
 
+	/** Count capturing subpatterns in a regular expression source
+	* @param {string} source
+	* @return {number}
+	*/
+	count_subpatterns: function (source) {
+		let in_bra = false;
+		let count = 0;
+		source.replace(/\\.|\[|]|\((?!\?)/g, str => {
+			if (str == (in_bra ? ']' : '[')) {
+				in_bra = !in_bra;
+			}
+			if (str == '(' && !in_bra) { // ( is literal inside []
+				count++;
+			}
+			return str;
+		});
+		return count;
+	},
+
 	build_regexp: function (key, tr1) {
 		const re = [ ];
 		const subpatterns = [ '' ];
 		for (const k in tr1) {
 			let in_bra = false;
-			subpatterns.push(k);
-			const s = tr1[k].source.replace(/\\.|\((?!\?)|\[|]|([a-z])(?:-([a-z]))?/gi, (str, match1, match2) => {
-				// count capturing subpatterns
+			for (let i = this.count_subpatterns(tr1[k].source) + 1; i--; ) { // + 1 for the () wrapping the whole subpattern
+				subpatterns.push(k);
+			}
+			const s = tr1[k].source.replace(/\\.|\[|]|([a-z])(?:-([a-z]))?/gi, (str, match1, match2) => {
 				if (str == (in_bra ? ']' : '[')) {
 					in_bra = !in_bra;
-				}
-				if (str == '(') {
-					subpatterns.push(k);
 				}
 				if (match1 && tr1[k].ignoreCase) {
 					if (in_bra) {
@@ -233,16 +250,9 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 		this.urls[key] = [url];
 		const regexps = [];
 		for (const path in paths) {
-			let in_bra = false;
-			paths[path].source.replace(/\\.|\[|]|\((?!\?)/g, str => { // count capturing subpatterns - a path may capture a prefix before the linked text, e.g. the dot in .at
-				if (str == (in_bra ? ']' : '[')) {
-					in_bra = !in_bra;
-				}
-				if (str == '(' && !in_bra) {
-					this.urls[key].push(path);
-				}
-				return str;
-			});
+			for (let i = this.count_subpatterns(paths[path].source); i--; ) { // a path may capture a prefix before the linked text, e.g. the dot in .at
+				this.urls[key].push(path);
+			}
 			regexps.push(paths[path].source);
 		}
 		this.links2[key] = new RegExp(prefix.source + '(?:' + regexps.join('|') + ')' + suffix.source, suffix.flags);
