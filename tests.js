@@ -121,4 +121,36 @@ for (const state of ['sql', 'sqlset', 'sqlstatus']) {
 	jush.urls[state][0] = jush.urls[state][0].replace('mariadb.com/kb', 'dev.mysql.com/doc/mysql');
 }
 
+// SQL autocomplete
+const tables = {
+	albums: ['id', 'interpret', 'title'],
+	songs: ['id', 'album', 'title'],
+};
+const quotedTables = { 'my albums': ['my id', 'title'], songs: ['id', 'album'] }; // names which are not identifiers are always quoted
+const autocompleteEsc = { pgsql: '""', mssql: '[]' }; // escaped empty identifier, the other states use ``
+const autocompleteTests = [ // state, text before and after the caret, expected words with the length of the typed prefix, tables with columns
+	['sql', 'SELECT * FROM ', '', '{"albums ":0,"songs ":0}', tables], // all tables are offered after FROM
+	['sql', 'SELECT id,\ntitle\nFROM albums\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // the query can span lines
+	['sql', '/* WHERE\nin a comment */\nSELECT * FROM albums\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a multi-line comment is ignored
+	['sql', 'SELECT * FROM albums\nWHERE id = 1\n;\n', '', '{"SELECT ":0,"INSERT INTO ":0,"UPDATE ":0,"DELETE FROM ":0,"TRUNCATE ":0,"EXPLAIN ":0}', tables], // the previous query is stripped
+	['sql', 'SELECT * FROM albums\n', '\nWHERE id = 1;\nSELECT * FROM songs ORDER BY x ', '{"INNER JOIN ":0,"LEFT JOIN ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // the next query is stripped, the rest of the current one is not
+	['sql', 'SELECT *\nFROM albums\nJOIN songs ON albums.id = songs.album\nWHERE ', '', '{"id":0,"interpret":0,"title":0,"album":0,"albums.":0,"songs.":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // columns of all joined tables
+	['sql', 'SELECT * FROM albums a\nWHERE a.', '', '{"id":0,"interpret":0,"title":0}', tables], // columns of an aliased table
+	['sql', 'SELECT * FROM albums\nWHERE ti', '', '{"title":2}', tables], // the value is the length of the typed prefix
+	['com', 'SELECT ', '', '{}', tables], // no autocomplete in a comment
+	['sql', 'SELECT * FROM ', '', '{"`my albums` ":0,"songs ":0}', quotedTables], // MySQL quotes a name which is not an identifier
+	['sql', 'SELECT * FROM `albums`\nWHERE ', '', '{"`id`":0,"`interpret`":0,"`title`":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a backtick anywhere quotes everything, the table name is found inside it
+	['pgsql', 'SELECT * FROM ', '', '{"\\"my albums\\" ":0,"songs ":0}', quotedTables], // PostgreSQL quotes by ""
+	['mssql', 'SELECT * FROM [my albums]\nWHERE ', '', '{"[my id]":0,"[title]":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', quotedTables], // MS SQL quotes by [], the table name is found inside it
+];
+
+for (const test of autocompleteTests) {
+	const completed = JSON.stringify(jush.autocompleteSql(autocompleteEsc[test[0]] || '``', test[4])(test[0], test[1], test[2]));
+	if (completed !== test[3]) {
+		console.log(completed.replace(/['\\]/g, '\\$&'));
+		html.push('<b class="error">error:</b>');
+	}
+	html.push('<p><b class="lang">' + test[0] + ' (autocomplete)</b> <code class="jush-' + test[0] + '">' + jush.highlight(test[0], test[1] + '\u2038' + test[2]) + '\n' + jush.highlight('json', completed) + '</code></p>');
+}
+
 document.getElementById('result').innerHTML = html.join('\n');
