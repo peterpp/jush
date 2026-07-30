@@ -5,8 +5,8 @@
 	$.jush = jush;
 
 	/** Highlight element content
-	* @param [string]
-	* @return jQuery
+	* @param {string} [language]
+	* @return {jQuery}
 	* @this jQuery
 	*/
 	$.fn.jush = function (language) {

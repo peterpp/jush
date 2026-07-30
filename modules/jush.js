@@ -24,8 +24,8 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 	subpatterns: { },
 
 	/** Link stylesheet
-	* @param string
-	* @param [string]
+	* @param {string} href
+	* @param {string} [media]
 	*/
 	style: function (href, media) {
 		const link = document.createElement('link');
@@ -38,9 +38,9 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 	},
 
 	/** Highlight text
-	* @param string
-	* @param string
-	* @return string
+	* @param {string} language
+	* @param {string} text
+	* @return {string}
 	*/
 	highlight: function (language, text) {
 		this.last_tag = '';
@@ -49,9 +49,9 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 	},
 
 	/** Highlight html
-	* @param string
-	* @param string
-	* @return string
+	* @param {string} language
+	* @param {string} html
+	* @return {string}
 	*/
 	highlight_html: function (language, html) {
 		const original = html.replace(/<br(\s+[^>]*)?>/gi, '\n');
@@ -83,8 +83,8 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 	},
 
 	/** Highlight text in tags
-	* @param mixed tag name or array of HTMLElement
-	* @param number number of spaces for tab, 0 for tab itself, defaults to 4
+	* @param {string|HTMLElement[]} tag
+	* @param {number} [tab_width=4] number of spaces for tab, 0 for tab itself
 	*/
 	highlight_tag: function (tag, tab_width = 4) {
 		const pre = (typeof tag == 'string' ? [...document.getElementsByTagName(tag)] : tag);
@@ -411,8 +411,8 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 	},
 
 	/** Replace <&> by HTML entities
-	* @param string
-	* @return string
+	* @param {string} string
+	* @return {string}
 	*/
 	htmlspecialchars: function (string) {
 		return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -431,8 +431,8 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 	},
 
 	/** Decode HTML entities
-	* @param string
-	* @return string
+	* @param {string} string
+	* @return {string}
 	*/
 	html_entity_decode: function (string) {
 		return string.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&nbsp;/g, '\u00A0').replace(/&#(?:([0-9]+)|x([0-9a-f]+));/gi, (str, p1, p2) => { //! named entities
@@ -441,8 +441,8 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 	},
 
 	/** Add backslash before backslash
-	* @param string
-	* @return string
+	* @param {string} string
+	* @return {string}
 	*/
 	addslashes: function (string) {
 		return string.replace(/\\/g, '\\$&');
@@ -457,8 +457,8 @@ var jush = { // var (not const) - consumers such as Adminer check window.jush
 	},
 
 	/** Remove backslash before \"'
-	* @param string
-	* @return string
+	* @param {string} string
+	* @return {string}
 	*/
 	stripslashes: function (string) {
 		return string.replace(/\\([\\"'])/g, '$1');

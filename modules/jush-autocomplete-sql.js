@@ -1,7 +1,7 @@
 /** Get callback for autocompletition
-* @param string escaped empty identifier, e.g. `` for MySQL or [] for MS SQL
-* @param Object<string, Array<string>> keys are table names, values are lists of columns
-* @return Function see autocomplete()
+* @param {string} esc escaped empty identifier, e.g. `` for MySQL or [] for MS SQL
+* @param {Object<string, Array<string>>} tablesColumns keys are table names, values are lists of columns
+* @return {Function} see autocomplete()
 */
 jush.autocompleteSql = function (esc, tablesColumns) {
 	/**
@@ -30,10 +30,10 @@ jush.autocompleteSql = function (esc, tablesColumns) {
 	let forceEscape = false;
 
 	/** Get list of strings for autocompletion
-	* @param string
-	* @param string
-	* @param string
-	* @return Object<string, number> keys are words, values are offsets
+	* @param {string} state
+	* @param {string} before
+	* @param {string} after
+	* @return {Object<string, number>} keys are words, values are offsets
 	*/
 	function autocomplete(state, before, after) {
 		if (/^(one|com|sql_apo|sqlite_apo)$/.test(state)) {
@@ -129,7 +129,7 @@ jush.autocompleteSql = function (esc, tablesColumns) {
 		return new RegExp(re.replace(/`/g, () => (esc[0] == '[' ? '\\' : '') + esc[i++ % 2]), flags);
 	}
 
-	/** @return Object<string, string> key is alias, value is actual table */
+	/** @return {Object<string, string>} key is alias, value is actual table */
 	function findTables(query) {
 		const matches = query.matchAll(escRe('\\b(FROM|JOIN|INTO|UPDATE)\\s+(\\w+|`.+?`)((\\s+AS)?\\s+((?!(LEFT|INNER|JOIN|ON|USING|WHERE|GROUP|HAVING|ORDER|LIMIT)\\b)\\w+|`.+?`))?', 'gi')); //! handle `abc``def`
 		const result = {};
