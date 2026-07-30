@@ -17,7 +17,9 @@ $jush_api_file = __DIR__ . '/../jush-api.js';
 function description($markdown) {
 	$markdown = preg_replace('~\A---.*?\n---\n~s', '', $markdown);
 	foreach (preg_split('~\n{2,}~', $markdown) as $paragraph) {
-		if ($paragraph == '' || $paragraph[0] == '>') { // skip notes and warnings
+		$paragraph = trim($paragraph);
+		// skip notes and warnings, and lines with macros only, e.g. {{APIRef("XMLHttpRequest API")}}
+		if ($paragraph == '' || $paragraph[0] == '>' || trim(preg_replace('~\{\{.*?\}\}~s', '', $paragraph)) == '') {
 			continue;
 		}
 		$text = preg_replace_callback('~\{\{.*?\}\}~s', function ($match) {
