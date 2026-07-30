@@ -24,9 +24,10 @@ $properties = array_diff(read_dirs("$reference/properties"), ['--_star_']); // c
 $classes = [];
 $elements = [];
 foreach (read_dirs("$reference/selectors") as $dir) {
-	if (preg_match('~^_colon_(.+)~', $dir, $match)) {
+	// _ encodes arguments, e.g. _colon_host_function or _colon_-moz-locale-dir_ltr - these forms never match plain text
+	if (preg_match('~^_colon_([^_]+)$~', $dir, $match)) {
 		$classes[] = $match[1];
-	} elseif (preg_match('~^_doublecolon_(.+)~', $dir, $match)) {
+	} elseif (preg_match('~^_doublecolon_([^_]+)$~', $dir, $match)) {
 		$elements[] = $match[1];
 	}
 }
@@ -34,6 +35,6 @@ foreach (read_dirs("$reference/selectors") as $dir) {
 $jush = read_file($jush_file);
 $jush = set_list($jush, "jush.links.css_at = {\n\t'@\$val': /^(", ")\$/i", $ats, 'at-rules');
 $jush = set_list($jush, "jush.links.css_val = {\n\t'\$val': /^(", ")\$/i", $properties, 'properties');
-$jush = set_list($jush, "'_colon_\$1': /(", ")/,", $classes, 'pseudo-classes');
-$jush = set_list($jush, "'_doublecolon_\$1': /(:)(", ")/,", $elements, 'pseudo-elements');
+$jush = set_list($jush, "':\$1': /(", ")/,", $classes, 'pseudo-classes');
+$jush = set_list($jush, "'::\$1': /(:)(", ")/,", $elements, 'pseudo-elements');
 file_put_contents($jush_file, $jush);
