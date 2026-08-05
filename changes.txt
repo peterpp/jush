@@ -6,6 +6,7 @@ MySQL: Link the longest matching phrase
 PostgreSQL: Highlight function bodies in DO $$ and AS $$
 MS SQL: Highlight SQL in PHP mssql_query() and sqlsrv_query()
 CSS: Fix links to MDN
+JS: Highlight true, false and null
 JSDoc: Link tags to jsdoc.app, add new tags
 Highlight JSON
 Highlight Redis 8.10
