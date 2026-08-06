@@ -4,6 +4,7 @@ Fix highlighting in Safari < 16.4 and Firefox < 78
 Highlight keywords leaving the state (e.g. MySQL DO)
 MySQL: Link the longest matching phrase
 PostgreSQL: Highlight function bodies in DO $$ and AS $$
+MS SQL: Highlight SQL in PHP mssql_query() and sqlsrv_query()
 CSS: Fix links to MDN
 JSDoc: Link tags to jsdoc.app, add new tags
 Highlight JSON
