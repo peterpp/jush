@@ -10,7 +10,8 @@
 unnecessary escaping (e.g. echo "\'" or ='&quot;') is removed
 */
 
-var jush = { // var (not const) - consumers such as Adminer check window.jush
+// eslint-disable-next-line no-var -- var (not const) - consumers such as Adminer check window.jush
+var jush = {
 	create_links: true, // string for extra <a> parameters, e.g. 'target="_blank"'
 	timeout: 1000, // milliseconds
 	custom_links: { }, // { state: { url: regexp } }, for example { php : { 'doc/$&.html': /\b(getData|setData)\b/g } }
