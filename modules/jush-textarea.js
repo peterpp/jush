@@ -337,7 +337,6 @@ jush.textarea = (function () {
 		pre = document.createElement('pre');
 		pre.contentEditable = true;
 		pre.className = el.className + ' jush';
-		pre.style.border = '1px inset #ccc';
 		pre.style.width = el.clientWidth + 'px';
 		pre.style.height = el.clientHeight + 'px';
 		pre.style.padding = '3px';

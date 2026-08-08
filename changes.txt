@@ -1,3 +1,6 @@
+JUSH 3.1.1:
+Textarea: Style the border by CSS, the inset one was barely visible on two sides
+
 JUSH 3.1.0:
 Require ES6
 Fix highlighting in Safari < 16.4 and Firefox < 78
