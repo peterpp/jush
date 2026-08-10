@@ -5,6 +5,8 @@
 * @return {Function} see autocomplete()
 */
 jush.autocompleteSql = function (esc, tablesColumns, statements) {
+	const mysql = (esc == '``'); // the escaping is the only hint about the database
+
 	/**
 	* key: regular expression; ' ' will be expanded to '\\s+', '\\w' to esc[0]+'?\\w'+esc[1]+'?', '$' will be appended
 	* value: list of autocomplete words; '?' means to not use the word if it's already in the current query
@@ -12,8 +14,8 @@ jush.autocompleteSql = function (esc, tablesColumns, statements) {
 	const keywordsDefault = {
 		'^': statements || ['SELECT', 'INSERT INTO', 'UPDATE', 'DELETE FROM', 'TRUNCATE', 'EXPLAIN'],
 		'^EXPLAIN ': ['SELECT'],
-		'^INSERT ': ['IGNORE'],
-		'^INSERT [^]+\\) ': ['?VALUES', 'ON DUPLICATE KEY UPDATE'],
+		'^INSERT ': (mysql ? ['IGNORE'] : []),
+		'^INSERT [^]+\\) ': ['?VALUES'].concat(mysql ? ['ON DUPLICATE KEY UPDATE'] : []),
 		'^UPDATE \\w+ ': ['SET'],
 		'^UPDATE \\w+ SET [^]+ ': ['?WHERE'],
 		'^DELETE FROM \\w+ ': ['WHERE'],
@@ -24,7 +26,7 @@ jush.autocompleteSql = function (esc, tablesColumns, statements) {
 		'\\bSELECT (?![^]* (HAVING|ORDER BY|LIMIT|OFFSET) )[^]+ FROM [^]+ ': ['?GROUP BY'],
 		'\\bSELECT (?![^]* (ORDER BY|LIMIT|OFFSET) )[^]+ FROM [^]+ ': ['?HAVING'],
 		'\\bSELECT (?![^]* (LIMIT|OFFSET) )[^]+ FROM [^]+ ': ['?ORDER BY'], // this matches prefixes without LIMIT|OFFSET and offers ORDER BY if it's not already used in prefix or suffix
-		'\\bSELECT (?![^]* (OFFSET) )[^]+ FROM [^]+ ': ['?LIMIT', '?OFFSET'],
+		'\\bSELECT (?![^]* (OFFSET) )[^]+ FROM [^]+ ': (esc != '[]' ? ['?LIMIT', '?OFFSET'] : []), // MS SQL uses TOP
 		' ORDER BY (?![^]* (LIMIT|OFFSET) )[^]+ ': ['DESC'],
 	};
 
@@ -32,8 +34,8 @@ jush.autocompleteSql = function (esc, tablesColumns, statements) {
 	const literals = new RegExp(
 		'\'(?:[^\']|\'\')*\'?' // string, possibly unterminated
 		+ '|/\\*[^]*?(?:\\*/|$)' // block comment
-		+ '|(?:^|\\s)--[^\\n]*' // line comment
-		+ (esc == '``' ? '|#[^\\n]*' : '') // # is a comment only in MySQL
+		+ '|(?:^|\\s)--' + (mysql ? ' ' : '') + '[^\\n]*' // line comment
+		+ (mysql ? '|#[^\\n]*' : '') // # is a comment only in MySQL
 	, 'g');
 
 	let forceEscape = false;

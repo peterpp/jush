@@ -166,7 +166,11 @@ const autocompleteTests = [ // state, text before and after the caret, expected 
 	['sql', 'SELECT * FROM ', '', '{"`my albums` ":0,"songs ":0}', quotedTables], // MySQL quotes a name which is not an identifier
 	['sql', 'SELECT * FROM `albums`\nWHERE ', '', '{"`id`":0,"`interpret`":0,"`title`":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a backtick anywhere quotes everything, the table name is found inside it
 	['pgsql', 'SELECT * FROM ', '', '{"\\"my albums\\" ":0,"songs ":0}', quotedTables], // PostgreSQL quotes by ""
-	['mssql', 'SELECT * FROM [my albums]\nWHERE ', '', '{"[my id]":0,"[title]":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', quotedTables], // MS SQL quotes by [], the table name is found inside it
+	['mssql', 'SELECT * FROM [my albums]\nWHERE ', '', '{"[my id]":0,"[title]":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0}', quotedTables], // MS SQL quotes by [], the table name is found inside it; MS SQL has no LIMIT
+	['sql', 'INSERT ', '', '{"IGNORE ":0}', tables], // INSERT IGNORE is MySQL-specific
+	['pgsql', 'INSERT ', '', '{}', tables],
+	['sql', 'INSERT INTO albums (id) ', '', '{"VALUES ":0,"ON DUPLICATE KEY UPDATE ":0}', tables], // ON DUPLICATE KEY UPDATE is MySQL-specific
+	['pgsql', 'INSERT INTO albums (id) ', '', '{"VALUES ":0}', tables],
 	['sql', '', '', '{"INSERT INTO ":0,"UPDATE ":0,"DELETE FROM ":0}', tables, ['INSERT INTO', 'UPDATE', 'DELETE FROM']], // only the passed statements are offered, e.g. in a trigger
 	['sql', '', '', '{}', tables, []], // no statement is offered, e.g. in a check constraint
 ];
