@@ -160,6 +160,8 @@ const autocompleteTests = [ // state, text before and after the caret, expected 
 	['sql', 'SELECT * FROM albums a\nWHERE a.', '', '{"id":0,"interpret":0,"title":0}', tables], // columns of an aliased table
 	['sql', 'SELECT * FROM albums\nWHERE ti', '', '{"title":2}', tables], // the value is the length of the typed prefix
 	['com', 'SELECT ', '', '{}', tables], // no autocomplete in a comment
+	['com_nest', 'SELECT ', '', '{}', tables], // no autocomplete in a PostgreSQL comment
+	['sql_quo', 'SELECT * FROM albums WHERE a = "x AND ', '', '{}', tables], // no autocomplete in a MySQL string quoted by "
 	['sql', 'SELECT * FROM ', '', '{"`my albums` ":0,"songs ":0}', quotedTables], // MySQL quotes a name which is not an identifier
 	['sql', 'SELECT * FROM `albums`\nWHERE ', '', '{"`id`":0,"`interpret`":0,"`title`":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a backtick anywhere quotes everything, the table name is found inside it
 	['pgsql', 'SELECT * FROM ', '', '{"\\"my albums\\" ":0,"songs ":0}', quotedTables], // PostgreSQL quotes by ""

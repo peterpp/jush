@@ -53,7 +53,8 @@ jush.autocompleteSql = function (esc, tablesColumns, statements) {
 	* @return {Object<string, number>} keys are words, values are offsets
 	*/
 	function autocomplete(state, before, after) {
-		if (/^(one|com|sql_apo|sqlite_apo)$/.test(state)) {
+		// bac, bra, mssql_bra and sqlite_quo are identifiers so they are completed
+		if (/^(one|com|com_nest|sql_apo|sqlite_apo|sql_quo)$/.test(state)) {
 			return {};
 		}
 		before = before
