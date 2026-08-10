@@ -90,8 +90,9 @@ jush.autocompleteSql = function (esc, tablesColumns, statements) {
 		const preferred = {
 			'\\b(FROM|INTO|^UPDATE|JOIN|^TRUNCATE) ': allTables, // all tables including the current ones (self-join)
 			'\\b(^INSERT|USING) [^(]*\\(([^)]+, )?': columns, // offer columns right after '(' or after ','
+			'\\b(?!(IN|VALUES)\\()[a-z_]\\w*\\(([^)]+, )?': columns, // function call; IN() and VALUES() contain values
 			'(^UPDATE [^]+ SET| DUPLICATE KEY UPDATE| BY) ([^]+, )?': columns,
-			' (WHERE|HAVING|AND|OR|ON|=) ': columns,
+			' (WHERE|HAVING|AND|OR|ON|=) (\\(\\s*)*': columns, // the condition can be parenthesized
 		};
 		keywordsDefault['\\bSELECT( DISTINCT)? (?![^]* FROM )([^]+, )?'] = columns; // this is not in preferred because we prefer '*'
 

@@ -159,6 +159,9 @@ const autocompleteTests = [ // state, text before and after the caret, expected 
 	['sql', 'SELECT * FROM albums\n', '\nWHERE id = 1;\nSELECT * FROM songs ORDER BY x ', '{"INNER JOIN ":0,"LEFT JOIN ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // the next query is stripped, the rest of the current one is not
 	['sql', 'SELECT *\nFROM albums\nJOIN songs ON albums.id = songs.album\nWHERE ', '', '{"id":0,"interpret":0,"title":0,"album":0,"albums.":0,"songs.":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // columns of all joined tables
 	['sql', 'SELECT * FROM albums a\nWHERE a.', '', '{"id":0,"interpret":0,"title":0}', tables], // columns of an aliased table
+	['sql', 'SELECT * FROM albums WHERE (', '', '{"id":0,"interpret":0,"title":0}', tables], // the condition can be parenthesized
+	['sql', 'SELECT * FROM albums WHERE UPPER(', '', '{"id":0,"interpret":0,"title":0}', tables], // columns are offered in a function call
+	['sql', 'SELECT * FROM albums WHERE id IN (', '', '{}', tables], // IN contains values, not columns
 	['sql', 'SELECT * FROM albums\nWHERE ti', '', '{"title":2}', tables], // the value is the length of the typed prefix
 	['com', 'SELECT ', '', '{}', tables], // no autocomplete in a comment
 	['com_nest', 'SELECT ', '', '{}', tables], // no autocomplete in a PostgreSQL comment
