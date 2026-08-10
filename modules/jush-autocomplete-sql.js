@@ -121,7 +121,7 @@ jush.autocompleteSql = function (esc, tablesColumns, statements) {
 					for (let keyword of keywords[re]) {
 						if (keyword[0] == '?') {
 							keyword = keyword.substring(1);
-							if (query.match(new RegExp('\\s+' + keyword + '\\s+', 'i'))) {
+							if (query.match(new RegExp('\\s+' + keyword.replace(/ /g, '\\s+') + '\\s+', 'i'))) {
 								continue;
 							}
 						}

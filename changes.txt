@@ -1,6 +1,6 @@
 JUSH 3.2.0:
 Autocomplete: Allow restricting the statements offered at the beginning of a query
-Autocomplete: Fix strings and comments
+Autocomplete: Fix strings, comments and keywords split by a newline
 Textarea: Style the border by CSS, the inset one was barely visible on two sides
 Highlight Elasticsearch queries
 

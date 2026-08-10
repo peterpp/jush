@@ -147,6 +147,7 @@ const autocompleteEsc = { pgsql: '""', mssql: '[]' }; // escaped empty identifie
 const autocompleteTests = [ // state, text before and after the caret, expected words with the length of the typed prefix, tables with columns, statements offered at the beginning
 	['sql', 'SELECT * FROM ', '', '{"albums ":0,"songs ":0}', tables], // all tables are offered after FROM
 	['sql', 'SELECT id,\ntitle\nFROM albums\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // the query can span lines
+	['sql', 'SELECT * FROM albums ORDER\nBY id ', '', '{"LIMIT ":0,"OFFSET ":0,"DESC ":0}', tables], // a keyword split by a newline is recognized as already used
 	['sql', '/* WHERE\nin a comment */\nSELECT * FROM albums\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a multi-line comment is ignored
 	['sql', 'SELECT * FROM albums -- c1\nWHERE id = 1 -- c2 GROUP BY x\n', '', '{"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // every comment is ignored, not just the first one
 	['sql', 'SELECT * FROM albums # ORDER BY x\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // # is a comment in MySQL
