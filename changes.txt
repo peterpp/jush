@@ -1,5 +1,6 @@
 JUSH 3.1.1:
 Textarea: Style the border by CSS, the inset one was barely visible on two sides
+Highlight Elasticsearch queries
 
 JUSH 3.1.0:
 Require ES6
