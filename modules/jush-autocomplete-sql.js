@@ -28,7 +28,23 @@ jush.autocompleteSql = function (esc, tablesColumns, statements) {
 		' ORDER BY (?![^]* (LIMIT|OFFSET) )[^]+ ': ['DESC'],
 	};
 
+	// strings and comments must be found in a single pass, otherwise a delimiter inside the other construct would be honored
+	const literals = new RegExp(
+		'\'(?:[^\']|\'\')*\'?' // string, possibly unterminated
+		+ '|/\\*[^]*?(?:\\*/|$)' // block comment
+		+ '|(?:^|\\s)--[^\\n]*' // line comment
+		+ (esc == '``' ? '|#[^\\n]*' : '') // # is a comment only in MySQL
+	, 'g');
+
 	let forceEscape = false;
+
+	/** Replace a string by a placeholder and a comment by whitespace
+	* @param {string} literal
+	* @return {string}
+	*/
+	function replaceLiteral(literal) {
+		return (literal[0] == '\'' ? '0' : ' ');
+	}
 
 	/** Get list of strings for autocompletion
 	* @param {string} state
@@ -41,12 +57,14 @@ jush.autocompleteSql = function (esc, tablesColumns, statements) {
 			return {};
 		}
 		before = before
-			.replace(/\/\*[^]*?\*\/|(^|\s)--[^\n]*/, ' ') // replace comments with whitespace
-			.replace(/'[^']+'/, '0') // replace string with placeholder
+			.replace(literals, replaceLiteral)
 			.replace(/[^]*;/, '') // strip previous query
 			.replace(/^\s+/, '')
 		;
-		after = after.replace(/;[^]*/, ''); // strip next query
+		after = after
+			.replace(literals, replaceLiteral)
+			.replace(/;[^]*/, '') // strip next query
+		;
 		const query = before + after;
 		const allTables = Object.keys(tablesColumns);
 		const usedTables = findTables(query); // tables used by the current query

@@ -148,6 +148,12 @@ const autocompleteTests = [ // state, text before and after the caret, expected 
 	['sql', 'SELECT * FROM ', '', '{"albums ":0,"songs ":0}', tables], // all tables are offered after FROM
 	['sql', 'SELECT id,\ntitle\nFROM albums\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // the query can span lines
 	['sql', '/* WHERE\nin a comment */\nSELECT * FROM albums\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a multi-line comment is ignored
+	['sql', 'SELECT * FROM albums -- c1\nWHERE id = 1 -- c2 GROUP BY x\n', '', '{"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // every comment is ignored, not just the first one
+	['sql', 'SELECT * FROM albums # ORDER BY x\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // # is a comment in MySQL
+	['pgsql', 'SELECT * FROM albums # ORDER BY x\n', '', '{"LIMIT ":0,"OFFSET ":0,"DESC ":0}', tables], // # is not a comment in PostgreSQL, the ORDER BY is a part of the query
+	['sql', 'SELECT * FROM albums WHERE a = \'x -- y\' AND ', '', '{"id":0,"interpret":0,"title":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a comment inside a string doesn't start a comment
+	['sql', 'SELECT * FROM albums WHERE a = \'x\' AND b = \'y;z\' AND ', '', '{"id":0,"interpret":0,"title":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a semicolon inside any string doesn't end the query
+	['sql', 'SELECT * FROM albums WHERE a = \'it\'\'s\' AND ', '', '{"id":0,"interpret":0,"title":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a doubled apostrophe doesn't end the string
 	['sql', 'SELECT * FROM albums\nWHERE id = 1\n;\n', '', '{"SELECT ":0,"INSERT INTO ":0,"UPDATE ":0,"DELETE FROM ":0,"TRUNCATE ":0,"EXPLAIN ":0}', tables], // the previous query is stripped
 	['sql', 'SELECT * FROM albums\n', '\nWHERE id = 1;\nSELECT * FROM songs ORDER BY x ', '{"INNER JOIN ":0,"LEFT JOIN ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // the next query is stripped, the rest of the current one is not
 	['sql', 'SELECT *\nFROM albums\nJOIN songs ON albums.id = songs.album\nWHERE ', '', '{"id":0,"interpret":0,"title":0,"album":0,"albums.":0,"songs.":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // columns of all joined tables
