@@ -282,14 +282,15 @@ jush.textarea = (function () {
 				}
 				return rest;
 			});
-			pre.innerHTML = innerHTML
+			const parsed = document.createElement('pre'); // outside the document, otherwise the element would be rebuilt twice on each keystroke
+			parsed.innerHTML = innerHTML
 				.replace(/^<br\b[^>]*>$/i, '') // Mac OS: Firefox, Chrome
 				.replace(/<(br|div)\b[^>]*>/gi, '\n') // Firefox, Chrome
 				.replace(/&nbsp;(<\/[pP]\b)/g, '$1') // IE
 				.replace(/<\/p\b[^>]*>($|<p\b[^>]*>)/gi, '\n') // IE
 				.replace(/(&nbsp;)+$/gm, '') // Chrome for some users
 			;
-			setText(pre, pre.textContent.replace(/\u00A0/g, ' '), end);
+			setText(pre, parsed.textContent.replace(/\u00A0/g, ' '), end);
 			pre.jushUndo.length = pre.jushUndoPos + 1;
 			if (forceNewUndo || !pre.jushUndo.length || pre.jushUndo[pre.jushUndoPos].end !== start) {
 				pre.jushUndo.push({ text: pre.jushTextarea.value, start: start, end: (forceNewUndo ? undefined : end) });
