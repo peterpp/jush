@@ -1,15 +1,16 @@
 /** Get callback for autocompletition
 * @param {string} esc escaped empty identifier, e.g. `` for MySQL or [] for MS SQL
 * @param {Object<string, Array<string>>} tablesColumns keys are table names, values are lists of columns
+* @param {Array<string>} [statements] statements offered at the beginning of a query, all by default
 * @return {Function} see autocomplete()
 */
-jush.autocompleteSql = function (esc, tablesColumns) {
+jush.autocompleteSql = function (esc, tablesColumns, statements) {
 	/**
 	* key: regular expression; ' ' will be expanded to '\\s+', '\\w' to esc[0]+'?\\w'+esc[1]+'?', '$' will be appended
 	* value: list of autocomplete words; '?' means to not use the word if it's already in the current query
 	*/
 	const keywordsDefault = {
-		'^': ['SELECT', 'INSERT INTO', 'UPDATE', 'DELETE FROM', 'TRUNCATE', 'EXPLAIN'],
+		'^': statements || ['SELECT', 'INSERT INTO', 'UPDATE', 'DELETE FROM', 'TRUNCATE', 'EXPLAIN'],
 		'^EXPLAIN ': ['SELECT'],
 		'^INSERT ': ['IGNORE'],
 		'^INSERT [^]+\\) ': ['?VALUES', 'ON DUPLICATE KEY UPDATE'],

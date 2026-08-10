@@ -144,7 +144,7 @@ const tables = {
 };
 const quotedTables = { 'my albums': ['my id', 'title'], songs: ['id', 'album'] }; // names which are not identifiers are always quoted
 const autocompleteEsc = { pgsql: '""', mssql: '[]' }; // escaped empty identifier, the other states use ``
-const autocompleteTests = [ // state, text before and after the caret, expected words with the length of the typed prefix, tables with columns
+const autocompleteTests = [ // state, text before and after the caret, expected words with the length of the typed prefix, tables with columns, statements offered at the beginning
 	['sql', 'SELECT * FROM ', '', '{"albums ":0,"songs ":0}', tables], // all tables are offered after FROM
 	['sql', 'SELECT id,\ntitle\nFROM albums\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // the query can span lines
 	['sql', '/* WHERE\nin a comment */\nSELECT * FROM albums\n', '', '{"INNER JOIN ":0,"LEFT JOIN ":0,"WHERE ":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a multi-line comment is ignored
@@ -158,10 +158,12 @@ const autocompleteTests = [ // state, text before and after the caret, expected 
 	['sql', 'SELECT * FROM `albums`\nWHERE ', '', '{"`id`":0,"`interpret`":0,"`title`":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', tables], // a backtick anywhere quotes everything, the table name is found inside it
 	['pgsql', 'SELECT * FROM ', '', '{"\\"my albums\\" ":0,"songs ":0}', quotedTables], // PostgreSQL quotes by ""
 	['mssql', 'SELECT * FROM [my albums]\nWHERE ', '', '{"[my id]":0,"[title]":0,"GROUP BY ":0,"HAVING ":0,"ORDER BY ":0,"LIMIT ":0,"OFFSET ":0}', quotedTables], // MS SQL quotes by [], the table name is found inside it
+	['sql', '', '', '{"INSERT INTO ":0,"UPDATE ":0,"DELETE FROM ":0}', tables, ['INSERT INTO', 'UPDATE', 'DELETE FROM']], // only the passed statements are offered, e.g. in a trigger
+	['sql', '', '', '{}', tables, []], // no statement is offered, e.g. in a check constraint
 ];
 
 for (const test of autocompleteTests) {
-	const completed = JSON.stringify(jush.autocompleteSql(autocompleteEsc[test[0]] || '``', test[4])(test[0], test[1], test[2]));
+	const completed = JSON.stringify(jush.autocompleteSql(autocompleteEsc[test[0]] || '``', test[4], test[5])(test[0], test[1], test[2]));
 	if (completed !== test[3]) {
 		console.log(completed.replace(/['\\]/g, '\\$&'));
 		html.push('<b class="error">error:</b>');
