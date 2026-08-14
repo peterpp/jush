@@ -3,6 +3,7 @@ Autocomplete: Allow restricting the statements offered at the beginning of a que
 Autocomplete: Fix strings, comments and offered words
 Textarea: Style the border by CSS, the inset one was barely visible on two sides
 JS: Highlight true, false and null
+JS: Fix links to MDN
 Highlight Elasticsearch queries
 
 JUSH 3.1.0:

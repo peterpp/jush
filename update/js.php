@@ -92,13 +92,13 @@ sort($xhr_methods);
 
 $jush = read_file($jush_file);
 // static members first so that e.g. Math\.abs wins over Math
-$jush = set_list($jush, "'JavaScript/Reference/Global_Objects/\$1': /(", ")/,", array_merge($statics, $objects), 'globals');
-$jush = set_list($jush, "'JavaScript/Reference/Statements/\$1': /(", ")/,", $statements, 'statements');
+$jush = set_list($jush, "'Web/JavaScript/Reference/Global_Objects/\$1': /(", ")/,", array_merge($statics, $objects), 'globals');
+$jush = set_list($jush, "'Web/JavaScript/Reference/Statements/\$1': /(", ")/,", $statements, 'statements');
 $jush = set_list($jush, "'Web/API/XMLHttpRequest/\$1': /(\\.)(", ")/,", $xhr_methods, 'XMLHttpRequest methods');
-preg_match_all("~'JavaScript/Reference/Global_Objects/(\w+)/\\\$1'~", $jush, $matches);
+preg_match_all("~'Web/JavaScript/Reference/Global_Objects/(\w+)/\\\$1'~", $jush, $matches);
 foreach ($matches[1] as $object) {
 	sort($instances[$object]);
-	$jush = set_list($jush, "'JavaScript/Reference/Global_Objects/$object/\$1': /(\\.)(", ")/,", $instances[$object], "$object members");
+	$jush = set_list($jush, "'Web/JavaScript/Reference/Global_Objects/$object/\$1': /(\\.)(", ")/,", $instances[$object], "$object members");
 }
 file_put_contents($jush_file, $jush);
 
